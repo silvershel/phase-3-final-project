@@ -1,10 +1,28 @@
 # lib/models/project.py
 from models.__init__ import CURSOR, CONN
 
+# TO DO
+# Finalize attributes
+# Save
+# Update
+# Delete
+# Create
+# Instance from DB
+# List all
+# Find by ID
+# Find by weight
+# List all projects
+# Create a new project
+# Update a project
+# Delete a project
+
+# STRETCH
+
 class Project:
+
+    all = {}
     
-    def __init__(self, name, id = None):
-        self.id = id
+    def __init__(self, name):
         self.name = name
 
     @property
@@ -21,7 +39,6 @@ class Project:
     # update to reflect attributes listed above
     @classmethod
     def create_table(cls):
-        """ Create a new table to persist the attributes of Project instances """
         sql = """
             CREATE TABLE IF NOT EXISTS projects (
             id INTEGER PRIMARY KEY,
@@ -30,14 +47,39 @@ class Project:
         CURSOR.execute(sql)
         CONN.commit()
 
-    # drop_table
+    @classmethod
+    def drop_table(cls):
+        sql = """
+            DROP TABLE IF EXISTS projects;
+        """
+        CURSOR.execute(sql)
+        CONN.commit()
     
-    # save 
-    # update 
-    # delete 
-    # create (new project instance)
-    # instance_from_db (return project object from database)
-        # needed for below
-    # get_all (return list containing one project object per row)
-    # find_by_id (return project object matching the specified id)
-    # find_by_name (return project object matching the specified name)
+    def save(self):
+        pass
+
+    def update(self):
+        pass
+
+    def delete(self):
+        pass
+
+    @classmethod
+    def create(cls):
+        pass
+
+    @classmethod
+    def instance_from_db(cls):
+        pass
+
+    @classmethod
+    def get_all(cls):
+        pass
+
+    @classmethod
+    def find_by_id(cls):
+        pass
+
+    @classmethod
+    def find_by_yarn_weight():
+        pass

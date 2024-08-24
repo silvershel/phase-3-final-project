@@ -4,6 +4,7 @@ from helpers import (
     exit_program,
     list_yarn,
     find_yarn_by_id,
+    find_yarn_by_weight,
     add_yarn,
     update_yarn,
     delete_yarn,
@@ -15,29 +16,30 @@ from helpers import (
 )
 
 def main_menu():
-    print()
+    print("----- \n")
     print("STASH MANAGER")
     print("Select an option:")
     print()
     print("0. Exit")
-    print("1. Go to Stash")
-    print("2. Go to Projects")
+    print("1. View Yarn")
+    print("2. View Projects")
 
 def stash_menu():
-    print()
-    print("STASH")
+    print("----- \n")
+    print("YARN")
     print("Select an option:")
     print()
     print("0. Exit")
     print("1. Main Menu")
-    print("2. List all yarn in stash")
+    print("2. List all yarn")
     print("3. Find yarn by ID")
-    print("4: Create yarn")
-    print("5: Update yarn")
-    print("6: Delete yarn")
+    print("4. Find yarn by weight")
+    print("5: Add yarn")
+    print("6: Update yarn")
+    print("7: Delete yarn")
 
 def project_menu():
-    print()
+    print("----- \n")
     print("PROJECTS")
     print("Select an option:")
     print()
@@ -45,14 +47,14 @@ def project_menu():
     print("1. Main Menu")
     print("2. List all projects")
     print("3. Find project by yarn weight") # not created
-    print("4: Create project")
-    print("5: Update project")
-    print("6: Delete project")
+    print("4: Start a project")
+    print("5: Update a project")
+    print("6: Delete a project")
 
 
 def main():
+    clear_terminal()
     while True:
-        clear_terminal()
         main_menu()
         choice = input("> ")
         if choice == "1":
@@ -71,13 +73,16 @@ def main():
                 elif choice == "3":
                     find_yarn_by_id()
                 elif choice == "4":
-                    add_yarn()
+                    find_yarn_by_weight()
                 elif choice == "5":
-                    update_yarn()
+                    add_yarn()
                 elif choice == "6":
+                    update_yarn()
+                elif choice == "7":
                     delete_yarn()
                 else:
-                    print("Please select a valid option")
+                    clear_terminal()
+                    print("Please select a valid option.\n")
         elif choice == "2":
             clear_terminal()
             while True:
@@ -94,18 +99,20 @@ def main():
                 elif choice == "3":
                     find_project_by_id()
                 elif choice == "4":
-                    create_project()
+                    start_project()
                 elif choice == "5":
                     update_project()
                 elif choice == "6":
                     delete_project()
                 else:
-                    print("Please select a valid option")
+                    clear_terminal()
+                    print("Please select a valid option.\n")
         elif choice == "0":
             clear_terminal()
             exit_program()
         else:
-            print("Please select a valid option")
+            clear_terminal()
+            print("Please select a valid option.\n")
 
 
 if __name__ == "__main__":

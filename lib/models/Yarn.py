@@ -3,25 +3,32 @@ from models.__init__ import CURSOR, CONN
 from models.project import Project
 
 # TO DO
-# specify yarn weights to search by toLowerCase (lace, sock, DK, worsted, aran, bulky)
+# Being used by Project X
+# Check attribute validations in Yarn class setters.
+# Be able to skip an Update field by hitting enter.
+# Be able to exit out from updating a yarn entry.
+# Title case check (Farmer's going to Farmer'S)
+# Clean up print() functions and all output text.
 
-# STRETCH Delete number of skeins only?
+# STRETCH 
+# Delete number of skeins only?
 # Add yarn with same details to existing entries?
-# If string, make search toLowerCase 
 
 class Yarn:
     
     all = {}
 
-    def __init__(self, brand, color, weight, yds, qty):
+    def __init__(self, brand, product, color, weight, yds, qty, id = None):
+        self.id = id
         self.brand = brand.title()
+        self.product = product.title()
         self.color = color.title()
         self.weight = weight.title()
         self.yds = yds
         self.qty = qty
 
     def __repr__(self):
-        return f"{self.id}: Brand = {self.brand}, Color = {self.color}, Weight = {self.weight}, Yds = {self.yds}, Qty = {self.qty}"
+        return f"Brand: {self.brand}\nProduct: {self.product}\nColor: {self.color}\nWeight: {self.weight}\nYds: {self.yds}\nQty: {self.qty}\nID: {self.id}\n"
 
     @property
     def brand(self):
@@ -29,10 +36,21 @@ class Yarn:
     
     @brand.setter
     def brand(self, brand):
-        if isinstance(brand, str) and len(brand):
+        if isinstance(brand, str) and len(brand) > 0:
             self._brand = brand.title()
         else:
             raise ValueError("Name must be a non-empty string.")
+    
+    @property
+    def product(self):
+        return self._product
+    
+    @product.setter
+    def product(self, product):
+        if isinstance(product, str) and len(product) > 0:
+            self._product = product.title()
+        else:
+            raise ValueError("Product must be a non-empty string.")
 
     @property
     def color(self):
@@ -40,7 +58,7 @@ class Yarn:
     
     @color.setter
     def color(self, color):
-        if isinstance(color, str) and len(color):
+        if isinstance(color, str) and len(color) > 0:
             self._color = color.title()
         else:
             raise ValueError("Color must be a non-empty string.")
@@ -51,10 +69,10 @@ class Yarn:
     
     @weight.setter
     def weight(self, weight):
-        if type(weight) is str:
+        if type(weight) is str and len(weight) > 0:
             self._weight = weight.title()
         else:
-            raise ValueError("Weight must be a string.")
+            raise ValueError("Weight must be a non-empty string.")
 
     @property
     def yds(self):
@@ -90,6 +108,7 @@ class Yarn:
                 CREATE TABLE IF NOT EXISTS yarns (
                 id INTEGER PRIMARY KEY,
                 brand TEXT,
+                product TEXT,
                 color TEXT,
                 weight TEXT,
                 yds INTEGER,
@@ -110,11 +129,11 @@ class Yarn:
         Yarn.create_table()
 
         sql = """
-            INSERT INTO yarns (brand, color, weight, yds, qty)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO yarns (brand, product, color, weight, yds, qty)
+            VALUES (?, ?, ?, ?, ?, ?)
         """
 
-        CURSOR.execute(sql, (self.brand, self.color, self.weight, self.yds, self.qty))
+        CURSOR.execute(sql, (self.brand, self.product, self.color, self.weight, self.yds, self.qty))
         CONN.commit()
 
         self.id = CURSOR.lastrowid
@@ -124,10 +143,10 @@ class Yarn:
     def update(self):
         sql = """
             UPDATE yarns
-            SET brand = ?, color = ?, weight = ?, yds = ?, qty = ?
+            SET brand = ?, product = ?, color = ?, weight = ?, yds = ?, qty = ?
             WHERE id = ?
         """
-        CURSOR.execute(sql, (self.brand, self.color,
+        CURSOR.execute(sql, (self.brand, self.product, self.color,self.weight,
                              self.yds, self.qty, self.id))
         CONN.commit()
         
@@ -144,8 +163,8 @@ class Yarn:
         self.id = None
 
     @classmethod
-    def create(cls, brand, color, weight, yds, qty):
-        yarn = cls(brand, color, weight, yds, qty)
+    def create(cls, brand, product, color, weight, yds, qty):
+        yarn = cls(brand, product, color, weight, yds, qty)
         yarn.save()
         return yarn
     
@@ -158,13 +177,14 @@ class Yarn:
         if yarn:
             # ensure attributes match row values in case local instance was modified
             yarn.brand = row[1]
-            yarn.color = row[2]
-            yarn.weight = row[3]
-            yarn.yds = row[4]
-            yarn.qty = row[5]
+            yarn.product = row[2]
+            yarn.color = row[3]
+            yarn.weight = row[4]
+            yarn.yds = row[5]
+            yarn.qty = row[6]
         else:
             # not in dictionary, create new instance and add to dictionary
-            yarn = cls(row[1], row[2], row[3], row[4], row[5])
+            yarn = cls(row[1], row[2], row[3], row[4], row[5], row[6])
             yarn.id = row[0]
             cls.all[yarn.id] = yarn
         return yarn
