@@ -4,21 +4,20 @@ from models.project import Project
 from models.yarn import Yarn
 
 # TO DO
-# Add one to many relationship
-# YARN Update add_yarn function for easy input (no exiting, enter to pass through)
-# YARN Update update_yarn function for easy inputs (no exiting, enter to pass through)
 # PROJECT Add find_by_type function
+# YARN Add one to many relationship
+# Edit the "add" and "update" functions for easy input (no exiting, enter to pass through)
+# Be able to exit out from updating an entry.
 # Look for repeated code and create functions to simplify
     # get_input
-    # display_message
+    # clear_and_print
     # display_items
     # find_item_by_attribute
-# Be able to exit out from updating an entry.
 # Title case check (Farmer's going to Farmer'S)
 
 # STRETCH 
-# Delete number of skeins only?
-# Add yarn with same details to existing entries?
+# YARN Add dye lot option
+# YARN Combine yarn with same details?
 
 
 
@@ -29,14 +28,19 @@ def clear_terminal():
     else:
         os.system('clear')
 
-def exit_program():
+def clear_and_print(message):
+    ### two messages for some functions?
     clear_terminal()
-    print("Your stash has been managed. Goodbye.")
+    print(message)
+    print()
+
+def exit_program():
+    clear_and_print("Your stash has been managed. Goodbye.")
     exit()
 
 def get_valid_weight():
     valid_weights = ["lace", "sock", "sport", "dk", "worsted", "aran", "bulky"]
-    
+
     while True:
         weight = input("Enter the yarn weight: ").lower()
         if weight in valid_weights:
@@ -44,19 +48,21 @@ def get_valid_weight():
         else:
             print("Invalid weight. Please enter one of the following: lace, sock, sport, DK, worsted, aran, or bulky.")
 
-# STASH FUNCTIONS
-# No changes
+# YARN FUNCTIONS
 def list_yarn():
     clear_terminal()
-    print("ALL YARN\n")
+    print("ALL YARN")
+    print()
     yarns = Yarn.get_all()
     if yarns:
         sorted_yarns = sorted(yarns, key=lambda yarn: yarn.brand)
         for yarn in sorted_yarns:
             print(yarn)
-        print("Scroll up to view.\n")
+        print("Scroll up to view.")
+        print()
     else:
-        print("No yarn in stash.\n")
+        print("No yarn in stash.")
+        print()
 
 def find_yarn_by_brand():
     clear_terminal()
@@ -67,12 +73,11 @@ def find_yarn_by_brand():
         clear_terminal()
         for yarn in matching_yarns:
             print(yarn)
-        print("Scroll up to view.\n")
+        print("Scroll up to view.")
+        print()
     else:
-        clear_terminal()
-        print(f"No {brand.lower()} in stash.\n")
+        clear_and_print(f"No {brand.lower()} in stash.")
 
-# No changes
 def find_yarn_by_weight():
     clear_terminal()
     weight = input("Enter the yarn weight: ")
@@ -83,10 +88,10 @@ def find_yarn_by_weight():
         sorted_yarns = sorted(matching_yarns, key=lambda yarn: yarn.brand)
         for yarn in sorted_yarns:
             print(yarn)
-        print("Scroll up to view.\n")
+        print("Scroll up to view.")
+        print()
     else:
-        clear_terminal()
-        print(f"No {weight.lower()} weight yarn in stash.\n")
+        clear_and_print(f"No {weight.lower()} weight yarn in stash.")
 
 def add_yarn():
     clear_terminal()
@@ -98,11 +103,9 @@ def add_yarn():
     qty = int(input("Enter the total number of skeins: "))
     try:
         yarn = Yarn.create(brand, base, color, weight, yds, qty)
-        clear_terminal()
-        print(f"{yarn}\nScroll up to view.\n")
+        clear_and_print(f"{yarn}\nScroll up to view.")
     except Exception as exc:
-        clear_terminal()
-        print("Error adding new yarn: ", exc)
+        clear_and_print("Error adding new yarn: ", exc)
 
 def update_yarn():
     clear_terminal()
@@ -130,39 +133,38 @@ def update_yarn():
             qty = int(input("Enter the qty: "))
             yarn.qty = qty
             yarn.update()
-            clear_terminal()
-            print(f"{yarn}\nScroll up to view.\n")
+
+            clear_and_print(f"{yarn}\nScroll up to view.")
         except Exception as exc:
-            clear_terminal()
-            print("Error updating yarn: ", exc)
+            clear_and_print("Error updating yarn: ", exc)
     else:
         clear_terminal()
         print(f"Yarn not found.\n")
 
-# No changes
 def delete_yarn():
     clear_terminal()
     id_ = input("Enter the ID of the yarn you want to delete: ")
     if yarn := Yarn.find_by_id(id_):
-        clear_terminal()
-        print(f"Yarn {yarn.id} has been deleted.\n")
+        clear_and_print(f"Yarn {yarn.id} has been deleted.")
         yarn.delete()
     else:
-        clear_terminal()
-        print(f"Yarn not found.\n")
+        clear_and_print("Yarn not found.")
 
 
 # PROJECT FUNCTIONS
 def list_projects():
     clear_terminal()
-    print("ALL PROJECTS\n")
+    print("ALL PROJECTS")
+    print()
     projects = Project.get_all()
     if projects:
         for project in projects:
             print(project)
-        print("Scroll up to view.\n")
+        print("Scroll up to view.")
+        print()
     else:
-        print("No projects in database.\n")
+        print("No projects in database.")
+        print()
 
 def find_project_by_weight():
     clear_terminal()
@@ -173,10 +175,10 @@ def find_project_by_weight():
         clear_terminal()
         for project in matching_projects:
             print(project)
-            print("Scroll up to view.\n")
+        print("Scroll up to view.")
+        print()
     else:
-        clear_terminal()
-        print(f"No {weight.lower()} weight projects in library.\n")
+        clear_and_print(f"No {weight.lower()} weight projects in library.")
 
 def add_project():
     clear_terminal()
@@ -187,11 +189,9 @@ def add_project():
     yds_needed = int(input("Enter the approximate yardage needed: "))
     try:
         project = Project.create(name, type, size, weight, yds_needed)
-        clear_terminal()
-        print(f"{project}\nScroll up to view.\n")
+        clear_and_print(f"{project}\nScroll up to view.")
     except Exception as exc:
-        clear_terminal()
-        print("Error adding new project: ", exc)
+        clear_and_print("Error adding new project: ", exc)
 
 def update_project():
     clear_terminal()
@@ -207,23 +207,18 @@ def update_project():
             weight = input("Enter the weight of the yarn used: ")
             project.weight = weight
             project.update()
-            clear_terminal()
-            print(f"{project}\nScroll up to view.\n")
-        except Exception as exc:
-            clear_terminal()
-            print("Error updating project: ", exc)
-    else:
-        clear_terminal()
-        print(f"Project not found.\n")
 
-# No changes
+            clear_and_print(f"{project}\nScroll up to view.")
+        except Exception as exc:
+            clear_and_print("Error updating project: ", exc)
+    else:
+        clear_and_print(f"Project not found.")
+
 def delete_project():
     clear_terminal()
     id_ = input("Enter the ID of the project you want to delete: ")
     if project := Project.find_by_id(id_):
-        clear_terminal()
-        print(f"Project {project.id} has been deleted.\n")
+        clear_and_print(f"Project {project.id} has been deleted.")
         project.delete()
     else:
-        clear_terminal()
-        print(f"Project not found.\n")
+        clear_and_print(f"Project not found.")
