@@ -3,14 +3,14 @@ from helpers import (
     clear_terminal,
     exit_program,
     list_yarn,
-    find_yarn_by_id,
+    find_yarn_by_brand,
     find_yarn_by_weight,
     add_yarn,
     update_yarn,
     delete_yarn,
     list_projects,
-    find_project_by_id,
-    create_project,
+    find_project_by_weight,
+    add_project,
     update_project,
     delete_project
 )
@@ -21,8 +21,8 @@ def main_menu():
     print("Select an option:")
     print()
     print("0. Exit")
-    print("1. View Yarn")
-    print("2. View Projects")
+    print("1. Yarn")
+    print("2. Projects")
 
 def stash_menu():
     print("----- \n")
@@ -32,7 +32,7 @@ def stash_menu():
     print("0. Exit")
     print("1. Main Menu")
     print("2. List all yarn")
-    print("3. Find yarn by ID")
+    print("3. Find yarn by brand")
     print("4. Find yarn by weight")
     print("5: Add yarn")
     print("6: Update yarn")
@@ -46,8 +46,8 @@ def project_menu():
     print("0. Exit")
     print("1. Main Menu")
     print("2. List all projects")
-    print("3. Find project by yarn weight") # not created
-    print("4: Start a project")
+    print("3. Find project by yarn weight")
+    print("4: Add a project")
     print("5: Update a project")
     print("6: Delete a project")
 
@@ -71,7 +71,7 @@ def main():
                 elif choice == "2":
                     list_yarn()
                 elif choice == "3":
-                    find_yarn_by_id()
+                    find_yarn_by_brand()
                 elif choice == "4":
                     find_yarn_by_weight()
                 elif choice == "5":
@@ -97,9 +97,9 @@ def main():
                 elif choice == "2":
                     list_projects()
                 elif choice == "3":
-                    find_project_by_id()
+                    find_project_by_weight()
                 elif choice == "4":
-                    start_project()
+                    add_project()
                 elif choice == "5":
                     update_project()
                 elif choice == "6":
