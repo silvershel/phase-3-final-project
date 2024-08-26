@@ -22,18 +22,18 @@ class Project:
     @pattern.setter
     def pattern(self, pattern):
         if isinstance(pattern, str) and len(pattern):
-            self._pattern = pattern
+            self._pattern = pattern.title()
         else:
             raise ValueError("Pattern name must be a non-empty string.")
         
     @property
-    def title(self):
-        return self._title
+    def type(self):
+        return self._type
     
-    @title.setter
-    def title(self, title):
-        if isinstance(title, str) and len(title) > 0:
-            self._title = title
+    @type.setter
+    def type(self, type):
+        if isinstance(type, str) and len(type) > 0:
+            self._type = type.title()
 
     @property
     def size(self):

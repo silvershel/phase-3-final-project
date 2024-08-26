@@ -4,19 +4,20 @@ from models.project import Project
 from models.yarn import Yarn
 
 # TO DO
-# PROJECT Add find_by_type function
-# YARN Add one to many relationship
-# Edit the "add" and "update" functions for easy input (no exiting, enter to pass through)
+# PROJECT Add find_by_type function.
+# YARN Add one to many relationship.
+# YARN Add search by color family.
+# Edit the "add" and "update" functions for easy input (no exiting, enter to pass through).
 # Be able to exit out from updating an entry.
-# Look for repeated code and create functions to simplify
+# Look for repeated code and create functions to simplify.
     # get_input
     # clear_and_print
     # display_items
     # find_item_by_attribute
-# Title case check (Farmer's going to Farmer'S)
+# Title case check (Farmer's going to Farmer'S).
 
 # STRETCH 
-# YARN Add dye lot option
+# YARN Add dye lot option.
 # YARN Combine yarn with same details?
 
 
@@ -28,15 +29,20 @@ def clear_terminal():
     else:
         os.system('clear')
 
-def clear_and_print(message):
-    ### two messages for some functions?
+def clear_and_print(message_1, message_2 = None):
     clear_terminal()
-    print(message)
+    print(message_1)
+    if message_2:
+        print(message_2)
     print()
 
-def exit_program():
-    clear_and_print("Your stash has been managed. Goodbye.")
-    exit()
+def get_valid_input(field_name):
+    while True:
+        value = input(f"Enter the {field_name}: ")
+        if value:
+            return value
+        else:
+            print("Field can not be blank.")
 
 def get_valid_weight():
     valid_weights = ["lace", "sock", "sport", "dk", "worsted", "aran", "bulky"]
@@ -47,6 +53,10 @@ def get_valid_weight():
             return weight
         else:
             print("Invalid weight. Please enter one of the following: lace, sock, sport, DK, worsted, aran, or bulky.")
+
+def exit_program():
+    clear_and_print("Your stash has been managed. Goodbye.")
+    exit()
 
 # YARN FUNCTIONS
 def list_yarn():
@@ -103,7 +113,7 @@ def add_yarn():
     qty = int(input("Enter the total number of skeins: "))
     try:
         yarn = Yarn.create(brand, base, color, weight, yds, qty)
-        clear_and_print(f"{yarn}\nScroll up to view.")
+        clear_and_print(yarn, "Scroll up to view.")
     except Exception as exc:
         clear_and_print("Error adding new yarn: ", exc)
 
@@ -112,20 +122,9 @@ def update_yarn():
     id_ = input("Enter the ID of the yarn you want to update: ")
     if yarn := Yarn.find_by_id(id_):
         try:
-            # working on this to loop to make sure brand 
-            # is correctly entered and doesn't go back 
-            # to the main screen. Then update others.
-            while True:
-                brand = input("Enter the brand: ")
-                if brand:
-                    yarn.brand = brand
-                    break
-                else:
-                    print("Brand cannot be empty. Please try again.")
-            base = input("Enter the base name: ")
-            yarn.base = base
-            color = input("Enter the color: ")
-            yarn.color = color
+            yarn.brand = get_valid_input("brand")
+            yarn.base = get_valid_input("base")
+            yarn.color = get_valid_input("color")
             weight = get_valid_weight()
             yarn.weight = weight
             yds = int(input("Enter the number of yds in each skein: "))
@@ -134,7 +133,7 @@ def update_yarn():
             yarn.qty = qty
             yarn.update()
 
-            clear_and_print(f"{yarn}\nScroll up to view.")
+            clear_and_print(yarn, "Scroll up to view.")
         except Exception as exc:
             clear_and_print("Error updating yarn: ", exc)
     else:
@@ -189,7 +188,7 @@ def add_project():
     yds_needed = int(input("Enter the approximate yardage needed: "))
     try:
         project = Project.create(name, type, size, weight, yds_needed)
-        clear_and_print(f"{project}\nScroll up to view.")
+        clear_and_print(project, "Scroll up to view.")
     except Exception as exc:
         clear_and_print("Error adding new project: ", exc)
 
@@ -208,7 +207,7 @@ def update_project():
             project.weight = weight
             project.update()
 
-            clear_and_print(f"{project}\nScroll up to view.")
+            clear_and_print(project, "Scroll up to view.")
         except Exception as exc:
             clear_and_print("Error updating project: ", exc)
     else:

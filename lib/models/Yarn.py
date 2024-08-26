@@ -128,10 +128,10 @@ class Yarn:
     def update(self):
         sql = """
             UPDATE yarns
-            SET brand = ?, product = ?, color = ?, weight = ?, yds = ?, qty = ?
+            SET brand = ?, base = ?, color = ?, weight = ?, yds = ?, qty = ?
             WHERE id = ?
         """
-        CURSOR.execute(sql, (self.brand, self.product, self.color,
+        CURSOR.execute(sql, (self.brand, self.base, self.color,
                              self.weight, self.yds, self.qty, self.id))
         CONN.commit()
         
@@ -146,8 +146,8 @@ class Yarn:
         self.id = None
 
     @classmethod
-    def create(cls, brand, product, color, weight, yds, qty):
-        yarn = cls(brand, product, color, weight, yds, qty)
+    def create(cls, brand, base, color, weight, yds, qty):
+        yarn = cls(brand, base, color, weight, yds, qty)
         yarn.save()
         return yarn
     
@@ -156,7 +156,7 @@ class Yarn:
         yarn = cls.all.get(row[0])
         if yarn:
             yarn.brand = row[1]
-            yarn.product = row[2]
+            yarn.base = row[2]
             yarn.color = row[3]
             yarn.weight = row[4]
             yarn.yds = row[5]
