@@ -4,17 +4,17 @@ from models.project import Project
 from models.yarn import Yarn
 
 # TO DO
-# PROJECT Add find_by_type function.
 # YARN Add one to many relationship.
 # YARN Add search by color family.
-# Edit the "add" and "update" functions for easy input (no exiting, enter to pass through).
-# Be able to exit out from updating an entry.
+# PROJECT Add find_by_type function.
+# Fix inputs and connection to class validation.
 # Look for repeated code and create functions to simplify.
-    # get_input
-    # clear_and_print
     # display_items
     # find_item_by_attribute
-# Title case check (Farmer's going to Farmer'S).
+# Clean up:
+    # Add .strip() to inputs
+    # Title case check (Farmer's going to Farmer'S).
+    # Exit out of add/update options
 
 # STRETCH 
 # YARN Add dye lot option.
@@ -29,22 +29,32 @@ def clear_terminal():
     else:
         os.system('clear')
 
-def clear_and_print(message_1, message_2 = None):
+def clear_and_print(message_1, message_2=None):
     clear_terminal()
     print(message_1)
     if message_2:
         print(message_2)
     print()
 
-def get_valid_input(field_name):
+def input_str(field_name):
     while True:
         value = input(f"Enter the {field_name}: ")
         if value:
             return value
         else:
-            print("Field can not be blank.")
+            print(f"Field can not be blank.")
 
-def get_valid_weight():
+def input_int(field_name):
+    while True:
+        value = input(f"Enter the {field_name}: ")
+        if value.isdigit():
+            return int(value)
+        elif value == "":
+            print("Field cannot be blank.")
+        else:
+            print("Please enter a number (no letters).")
+
+def check_weight():
     valid_weights = ["lace", "sock", "sport", "dk", "worsted", "aran", "bulky"]
 
     while True:
@@ -52,8 +62,8 @@ def get_valid_weight():
         if weight in valid_weights:
             return weight
         else:
-            print("Invalid weight. Please enter one of the following: lace, sock, sport, DK, worsted, aran, or bulky.")
-
+            print('Please enter one of the following: "lace", "sock", "sport", "DK", "worsted", "aran", or "bulky".')
+    
 def exit_program():
     clear_and_print("Your stash has been managed. Goodbye.")
     exit()
@@ -61,7 +71,7 @@ def exit_program():
 # YARN FUNCTIONS
 def list_yarn():
     clear_terminal()
-    print("ALL YARN")
+    print("ALL YARN (alphabetical by brand)")
     print()
     yarns = Yarn.get_all()
     if yarns:
@@ -105,12 +115,12 @@ def find_yarn_by_weight():
 
 def add_yarn():
     clear_terminal()
-    brand = input("Enter the yarn brand: ")
-    base = input("Enter the base name: ")
-    color = input("Enter the yarn color: ")
-    weight = get_valid_weight()
-    yds = int(input("Enter the number of yds in each skein: "))
-    qty = int(input("Enter the total number of skeins: "))
+    brand = input_str("brand")
+    base = input_str("base")
+    color = input_str("color")
+    weight = check_weight()
+    yds = int(input_int("number of yds per skein"))
+    qty = int(input_int("total number of skeins"))
     try:
         yarn = Yarn.create(brand, base, color, weight, yds, qty)
         clear_and_print(yarn, "Scroll up to view.")
@@ -122,17 +132,13 @@ def update_yarn():
     id_ = input("Enter the ID of the yarn you want to update: ")
     if yarn := Yarn.find_by_id(id_):
         try:
-            yarn.brand = get_valid_input("brand")
-            yarn.base = get_valid_input("base")
-            yarn.color = get_valid_input("color")
-            weight = get_valid_weight()
-            yarn.weight = weight
-            yds = int(input("Enter the number of yds in each skein: "))
-            yarn.yds = yds
-            qty = int(input("Enter the qty: "))
-            yarn.qty = qty
+            yarn.brand = input_str("brand")
+            yarn.base = input_str("base")
+            yarn.color = input_str("color")
+            yarn.weight = check_weight()
+            yarn.yds = input_int("number of yds per skein")
+            yarn.qty = input_int("total number of skeins")
             yarn.update()
-
             clear_and_print(yarn, "Scroll up to view.")
         except Exception as exc:
             clear_and_print("Error updating yarn: ", exc)
@@ -181,13 +187,13 @@ def find_project_by_weight():
 
 def add_project():
     clear_terminal()
-    name = input("Enter the project name: ")
+    pattern = input("Enter the pattern name: ")
     type = input("Enter the project type (eg, sweater, hat...): ")
     size = input("Enter the size being made (n/a for none): ")
-    weight = get_valid_weight()
+    weight = check_weight()
     yds_needed = int(input("Enter the approximate yardage needed: "))
     try:
-        project = Project.create(name, type, size, weight, yds_needed)
+        project = Project.create(pattern, type, size, weight, yds_needed)
         clear_and_print(project, "Scroll up to view.")
     except Exception as exc:
         clear_and_print("Error adding new project: ", exc)
@@ -197,16 +203,12 @@ def update_project():
     id_ = input("Enter the ID of the project you want to update: ")
     if project := Project.find_by_id(id_):
         try:
-            name = input("Enter the name: ")
-            project.name = name
-            type = input("Enter the project type (eg, sweater, hat...): ")
-            project.type = type
-            size = input("Enter the size being made (n/a for none): ")
-            project.size = size
-            weight = input("Enter the weight of the yarn used: ")
-            project.weight = weight
+            project.pattern = input_str("pattern name")
+            project.type = input_str("project type")
+            project.size = input_str("size being made")
+            project.weight = check_weight()
+            project.yds_needed = input_int("yds needed")
             project.update()
-
             clear_and_print(project, "Scroll up to view.")
         except Exception as exc:
             clear_and_print("Error updating project: ", exc)
