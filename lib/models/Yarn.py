@@ -17,7 +17,13 @@ class Yarn:
         self.project_id = project_id
 
     def __repr__(self):
-        return f"{self.brand}, {self.base}\nColor: {self.color} | Weight: {self.weight} | Yds: {self.yds} | Qty: {self.qty}\nID: {self.id}\n"
+        repr = f"{self.brand}, {self.base}\nColor: {self.color} | Weight: {self.weight} | Yds: {self.yds} | Qty: {self.qty}\nID: {self.id}\n"
+        if self.project_id == None:
+            return repr
+        else:
+            project = Project.find_by_id(self.project_id)
+            repr += f"Being used for {project.pattern}.\n"
+            return repr
 
     @property
     def brand(self):

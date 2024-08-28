@@ -5,20 +5,17 @@ from models.project import Project
 from models.yarn import Yarn
 
 # TO DO
-# print yarns added to project 
-# update_yarn connects to stash.
-# no yarn available if in use by another project. 
-# List project title under each yarn and change format (color?) to highlight, else None.
+# Title case check (Farmer's going to Farmer'S).
 # List yarn used under each project.
-# List all yarns: add aditional logic to continue alphebetizing by color.
 
 # STRETCH
 # YARN - Add color_family
 # YARN - Add find_by_color_family
-# Be able to search for yarns when adding a project based on multiple attributes.
-# Be able to exit out of editing "add" and "update" fields.
-# Title case check (Farmer's going to Farmer'S).
-# Add .strip() to clean up inputs
+# YARN - add logic to alphebetize all_yarn list by color within each brand
+# Be able to connect yarn to a new project based on multiple attributes instead of just weight.
+# Be able to skip input fields.
+# Be able to exit out of input fields.
+# Mark yarn as unavailable if in use by another project. 
 
 
 # HELPER FUNCTIONS
@@ -161,6 +158,8 @@ def update_yarn():
             if project_id == "":
                 current_project_id = yarn.project_id
                 yarn.project_id = current_project_id
+            elif project_id == "None":
+                yarn.project_id = None
             else:
                 yarn.project_id = int(project_id)
                     
