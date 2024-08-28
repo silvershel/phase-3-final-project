@@ -60,12 +60,12 @@ def main():
     clear_terminal()
     while True:
         main_menu()
-        choice = input("> ")
+        choice = input("> ").upper()
         if choice == "1":
             clear_terminal()
             while True:
                 stash_menu()
-                choice = input("> ")
+                choice = input("> ").upper()
                 if choice == "EXIT":
                     clear_terminal()
                     exit_program()
@@ -91,7 +91,7 @@ def main():
             clear_terminal()
             while True:
                 project_menu()
-                choice = input("> ")
+                choice = input("> ").upper()
                 if choice == "EXIT":
                     clear_terminal()
                     exit_program()

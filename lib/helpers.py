@@ -5,6 +5,7 @@ from models.project import Project
 from models.yarn import Yarn
 
 # TO DO
+# updating a yarn updates project to somehting (2??) and doesn't leave it blank
 # One to many relationship
     # Test function to test setting the yarn.project_id to project.id.
     # Create function add_from_stash()
@@ -86,7 +87,6 @@ def check_weight():
         else:
             print('Please enter one of the following: "lace", "sock", "sport", "DK", "worsted", "aran", or "bulky".')
                 
-
 def exit_program():
     clear_and_print("Your stash has been managed. Goodbye.")
     exit()
@@ -157,7 +157,15 @@ def update_yarn():
             yarn.weight = check_weight()
             yarn.yds = input_int("number of yds per skein")
             yarn.qty = input_int("total number of skeins")
-            yarn.project_id = input_str("project ID")
+            project_id = input("Enter the project ID (enter to skip): ")
+            yarn.id = id_
+
+            if project_id == "":
+                current_project_id = yarn.project_id
+                yarn.project_id = current_project_id
+            else:
+                yarn.project_id = int(project_id)
+                    
             yarn.update()
             clear_and_print(yarn, "Scroll up to view.")
         except Exception as exc:
@@ -220,9 +228,45 @@ def add_project():
     size = input_str("size being made")
     weight = check_weight()
     yds_needed = input_int("yds needed")
+
     try:
         project = Project.create(pattern, category, size, weight, yds_needed)
-        clear_and_print(project, "Scroll up to view.")
+
+        while True:
+            connect_yarn = input("Would you like to connect yarn from your stash? (Y/N): ").upper()
+            if connect_yarn == "N":
+                clear_terminal()
+                print(project)
+                break
+            elif connect_yarn == "Y":
+                yarns = Yarn.get_all()
+                matching_yarns = [yarn for yarn in yarns if yarn.weight.lower() == weight.lower()]
+                if matching_yarns:
+                    for yarn in matching_yarns:
+                        clear_terminal()
+                        print(yarn)
+                        print_with_return("Scroll up to view.")
+
+                    while True:
+                        yarn_id = input("Please enter the ID of the yarn you'd like to use: ")
+                        yarn = Yarn.find_by_id(yarn_id)
+                        if yarn:
+                            yarn.project_id = project.id
+                            yarn.update()
+                        else:
+                            clear_and_print("Yarn not found.")
+
+                        more_yarn = input("Would you like to add more yarn? (Y/N): ").upper()
+                        if more_yarn == "N":
+                            break
+                else:
+                    print("Print statement if not matching_yarns")
+            else:
+                print("Print statement after first Y/N prompt.")
+                break
+            
+            clear_and_print(project, "Scroll up to view.")
+
     except Exception as exc:
         clear_and_print("Error adding new project: ", exc)
 
@@ -236,6 +280,7 @@ def update_project():
             project.size = input_str("size being made")
             project.weight = check_weight()
             project.yds_needed = input_int("yds needed")
+            project.id = id_
             project.update()
             clear_and_print(project, "Scroll up to view.")
         except Exception as exc:

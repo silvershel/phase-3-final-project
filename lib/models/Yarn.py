@@ -149,7 +149,7 @@ class Yarn:
             WHERE id = ?
         """
         CURSOR.execute(sql, (self.brand, self.base, self.color, self.weight,
-                            self.yds, self.qty, self.id, self.project_id))
+                            self.yds, self.qty, self.project_id, self.id))
         CONN.commit()
         
     def delete(self):       
