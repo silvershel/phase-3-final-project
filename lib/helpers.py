@@ -1,25 +1,25 @@
 # lib/helpers.py
+
 import os
 from models.project import Project
 from models.yarn import Yarn
 
 # TO DO
-# YARN Add one to many relationship.
-# YARN Add search by color family.
-# PROJECT Add find_by_type function.
-# Fix inputs and connection to class validation.
-# Look for repeated code and create functions to simplify.
-    # display_items
-    # find_item_by_attribute
-# Clean up:
-    # Add .strip() to inputs
-    # Title case check (Farmer's going to Farmer'S).
-    # Exit out of add/update options
+# One to many relationship
+    # Test function to test setting the yarn.project_id to project.id.
+    # Create function add_from_stash()
 
-# STRETCH 
-# YARN Add dye lot option.
-# YARN Combine yarn with same details?
+# When yarn has a project_id:
+    # List project title under each yarn and change format (color?) to highlight, else None.
+    # List yarn used under each project.
 
+# STRETCH
+# YARN - Add color_family
+# YARN - Add find_by_color_family
+# Be able to search for yarns when adding a project based on multiple attributes.
+# Be able to exit out of editing "add" and "update" fields.
+# Title case check (Farmer's going to Farmer'S).
+# Add .strip() to clean up inputs
 
 
 # HELPER FUNCTIONS
@@ -34,6 +34,10 @@ def clear_and_print(message_1, message_2=None):
     print(message_1)
     if message_2:
         print(message_2)
+    print()
+
+def print_with_return(message):
+    print(message)
     print()
 
 def input_str(field_name):
@@ -54,16 +58,35 @@ def input_int(field_name):
         else:
             print("Please enter a number (no letters).")
 
+def check_brand():
+    yarns = Yarn.get_all()
+    valid_brands = [yarn.brand for yarn in yarns]
+    while True:
+        brand = input("Enter the brand: ").title()
+        if brand in valid_brands:
+            return brand
+        else:
+            print(f"Not found. Please enter one of the following brands: {', '.join(sorted(set(valid_brands)))}")
+
+def check_category():
+    valid_categories = ["garment", "accessory", "other"]
+    while True:
+        category = input("Enter the project category: ").lower()
+        if category in valid_categories:
+            return category
+        else:
+            print('Please enter one of the following: "garment", "accessory", or "other"')
+
 def check_weight():
     valid_weights = ["lace", "sock", "sport", "dk", "worsted", "aran", "bulky"]
-
     while True:
         weight = input("Enter the yarn weight: ").lower()
         if weight in valid_weights:
             return weight
         else:
             print('Please enter one of the following: "lace", "sock", "sport", "DK", "worsted", "aran", or "bulky".')
-    
+                
+
 def exit_program():
     clear_and_print("Your stash has been managed. Goodbye.")
     exit()
@@ -71,36 +94,32 @@ def exit_program():
 # YARN FUNCTIONS
 def list_yarn():
     clear_terminal()
-    print("ALL YARN (alphabetical by brand)")
-    print()
+    print_with_return("ALL YARN (alphabetical by brand)")
     yarns = Yarn.get_all()
     if yarns:
         sorted_yarns = sorted(yarns, key=lambda yarn: yarn.brand)
         for yarn in sorted_yarns:
             print(yarn)
-        print("Scroll up to view.")
-        print()
+        print_with_return("Scroll up to view.")
     else:
-        print("No yarn in stash.")
-        print()
+        print_with_return("No yarn in stash.")
 
 def find_yarn_by_brand():
     clear_terminal()
-    brand = input("Enter the brand: ")
+    brand = check_brand()
     yarns = Yarn.get_all()
     matching_yarns = [yarn for yarn in yarns if yarn.brand.lower() == brand.lower()]
     if matching_yarns:
         clear_terminal()
         for yarn in matching_yarns:
             print(yarn)
-        print("Scroll up to view.")
-        print()
+        print_with_return("Scroll up to view.")
     else:
         clear_and_print(f"No {brand.lower()} in stash.")
 
 def find_yarn_by_weight():
     clear_terminal()
-    weight = input("Enter the yarn weight: ")
+    weight = check_weight()
     yarns = Yarn.get_all()
     matching_yarns = [yarn for yarn in yarns if yarn.weight.lower() == weight.lower()]
     if matching_yarns:
@@ -108,8 +127,7 @@ def find_yarn_by_weight():
         sorted_yarns = sorted(matching_yarns, key=lambda yarn: yarn.brand)
         for yarn in sorted_yarns:
             print(yarn)
-        print("Scroll up to view.")
-        print()
+        print_with_return("Scroll up to view.")
     else:
         clear_and_print(f"No {weight.lower()} weight yarn in stash.")
 
@@ -121,8 +139,9 @@ def add_yarn():
     weight = check_weight()
     yds = int(input_int("number of yds per skein"))
     qty = int(input_int("total number of skeins"))
+    project_id = None
     try:
-        yarn = Yarn.create(brand, base, color, weight, yds, qty)
+        yarn = Yarn.create(brand, base, color, weight, yds, qty, project_id)
         clear_and_print(yarn, "Scroll up to view.")
     except Exception as exc:
         clear_and_print("Error adding new yarn: ", exc)
@@ -138,13 +157,13 @@ def update_yarn():
             yarn.weight = check_weight()
             yarn.yds = input_int("number of yds per skein")
             yarn.qty = input_int("total number of skeins")
+            yarn.project_id = input_str("project ID")
             yarn.update()
             clear_and_print(yarn, "Scroll up to view.")
         except Exception as exc:
             clear_and_print("Error updating yarn: ", exc)
     else:
-        clear_terminal()
-        print(f"Yarn not found.\n")
+        clear_and_print(f"Yarn not found.")
 
 def delete_yarn():
     clear_terminal()
@@ -159,41 +178,50 @@ def delete_yarn():
 # PROJECT FUNCTIONS
 def list_projects():
     clear_terminal()
-    print("ALL PROJECTS")
-    print()
+    print_with_return("ALL PROJECTS")
     projects = Project.get_all()
     if projects:
         for project in projects:
             print(project)
-        print("Scroll up to view.")
-        print()
+        print_with_return("Scroll up to view.")
     else:
-        print("No projects in database.")
-        print()
+        print_with_return("No projects in database.")
+
+def find_project_by_category():
+    clear_terminal()
+    category = check_category()
+    projects = Project.get_all()
+    matching_projects = [project for project in projects if project.category.lower() == category.lower()]
+    if matching_projects:
+        clear_terminal()
+        for project in matching_projects:
+            print(project)
+        print_with_return("Scroll up to view.")
+    else:
+        clear_and_print(f"No {category} projects in library.")
 
 def find_project_by_weight():
     clear_terminal()
-    weight = input("Enter the yarn weight used: ")
+    weight = check_weight()
     projects = Project.get_all()
     matching_projects = [project for project in projects if project.weight.lower() == weight.lower()]
     if matching_projects:
         clear_terminal()
         for project in matching_projects:
             print(project)
-        print("Scroll up to view.")
-        print()
+        print_with_return("Scroll up to view.")
     else:
         clear_and_print(f"No {weight.lower()} weight projects in library.")
 
 def add_project():
     clear_terminal()
-    pattern = input("Enter the pattern name: ")
-    type = input("Enter the project type (eg, sweater, hat...): ")
-    size = input("Enter the size being made (n/a for none): ")
+    pattern = input_str("pattern name")
+    category = check_category()
+    size = input_str("size being made")
     weight = check_weight()
-    yds_needed = int(input("Enter the approximate yardage needed: "))
+    yds_needed = input_int("yds needed")
     try:
-        project = Project.create(pattern, type, size, weight, yds_needed)
+        project = Project.create(pattern, category, size, weight, yds_needed)
         clear_and_print(project, "Scroll up to view.")
     except Exception as exc:
         clear_and_print("Error adding new project: ", exc)
@@ -204,7 +232,7 @@ def update_project():
     if project := Project.find_by_id(id_):
         try:
             project.pattern = input_str("pattern name")
-            project.type = input_str("project type")
+            project.category = check_category()
             project.size = input_str("size being made")
             project.weight = check_weight()
             project.yds_needed = input_int("yds needed")

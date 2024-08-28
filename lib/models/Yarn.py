@@ -6,16 +6,18 @@ class Yarn:
     
     all = {}
 
-    def __init__(self, brand, base, color, weight, yds, qty):
+    def __init__(self, brand, base, color, weight, yds, qty, project_id=None, id=None):
+        self.id = id
         self.brand = brand.title()
         self.base = base.title()
         self.color = color.title()
         self.weight = weight.title()
         self.yds = yds
         self.qty = qty
+        self.project_id = project_id
 
     def __repr__(self):
-        return f"Brand: {self.brand}\nBase: {self.base}\nColor: {self.color}\nWeight: {self.weight}\nYds: {self.yds}\nQty: {self.qty}\nID: {self.id}\n"
+        return f"{self.brand}, {self.base}\nColor: {self.color} | Weight: {self.weight} | Yds: {self.yds} | Qty: {self.qty}\nID: {self.id}\n"
 
     @property
     def brand(self):
@@ -82,6 +84,19 @@ class Yarn:
             self._qty = qty
         else:
             raise ValueError("Quantity must be an integer.")
+        
+    @property
+    def project_id(self):
+        return self._project_id
+    
+    @project_id.setter
+    def project_id(self, project_id):
+        if project_id == None:
+            self._project_id = None
+        elif type(project_id) is int:
+            self._project_id = project_id
+        else:
+            raise ValueError("Project ID must be an integer.")
     
     @classmethod
     def table_exists(cls):
@@ -99,7 +114,9 @@ class Yarn:
                 color TEXT,
                 weight TEXT,
                 yds INTEGER,
-                qty INTEGER)
+                qty INTEGER,
+                project_id INTEGER,
+                FOREIGN KEY (project_id) REFERENCES projects(id))
             """
             CURSOR.execute(sql)
             CONN.commit()
@@ -115,10 +132,10 @@ class Yarn:
     def save(self):
         Yarn.create_table()
         sql = """
-            INSERT INTO yarns (brand, base, color, weight, yds, qty)
-            VALUES (?, ?, ?, ?, ?, ?)
+            INSERT INTO yarns (brand, base, color, weight, yds, qty, project_id)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
         """
-        CURSOR.execute(sql, (self.brand, self.base, self.color, self.weight, self.yds, self.qty))
+        CURSOR.execute(sql, (self.brand, self.base, self.color, self.weight, self.yds, self.qty, self.project_id))
         CONN.commit()
 
         self.id = CURSOR.lastrowid
@@ -128,11 +145,11 @@ class Yarn:
     def update(self):
         sql = """
             UPDATE yarns
-            SET brand = ?, base = ?, color = ?, weight = ?, yds = ?, qty = ?
+            SET brand = ?, base = ?, color = ?, weight = ?, yds = ?, qty = ?, project_id = ?
             WHERE id = ?
         """
-        CURSOR.execute(sql, (self.brand, self.base, self.color,
-                             self.weight, self.yds, self.qty, self.id))
+        CURSOR.execute(sql, (self.brand, self.base, self.color, self.weight,
+                            self.yds, self.qty, self.id, self.project_id))
         CONN.commit()
         
     def delete(self):       
@@ -146,8 +163,8 @@ class Yarn:
         self.id = None
 
     @classmethod
-    def create(cls, brand, base, color, weight, yds, qty):
-        yarn = cls(brand, base, color, weight, yds, qty)
+    def create(cls, brand, base, color, weight, yds, qty, project_id):
+        yarn = cls(brand, base, color, weight, yds, qty, project_id)
         yarn.save()
         return yarn
     
@@ -161,9 +178,9 @@ class Yarn:
             yarn.weight = row[4]
             yarn.yds = row[5]
             yarn.qty = row[6]
+            yarn.project_id = row[7]
         else:
-            yarn = cls(row[1], row[2], row[3], row[4], row[5], row[6])
-            yarn.id = row[0]
+            yarn = cls(row[1], row[2], row[3], row[4], row[5], row[6], row[7], id = row[0])
             cls.all[yarn.id] = yarn
         return yarn
     
@@ -185,46 +202,3 @@ class Yarn:
         """
         row = CURSOR.execute(sql, (id,)).fetchone()
         return cls.instance_from_db(row) if row else None
-    
-    @classmethod
-    def find_by_brand(cls, brand):
-        sql = """
-            SELECT *
-            FROM yarns
-            WHERE brand is ?
-        """
-        row = CURSOR.execute(sql, (brand,)).fetchone()
-        return cls.instance_from_db(row) if row else None
-    
-    @classmethod
-    def find_by_color(cls, color):
-        sql = """
-            SELECT *
-            FROM yarns
-            WHERE color is ?
-        """
-        row = CURSOR.execute(sql, (color,)).fetchone()
-        return cls.instance_from_db(row) if row else None
-    
-    @classmethod
-    def find_by_weight(cls, weight):
-        sql = """
-            SELECT *
-            FROM yarns
-            WHERE weight is ?
-        """
-        row = CURSOR.execute(sql, (weight,)).fetchone()
-        return cls.instance_from_db(row) if row else None
-    
-    @classmethod
-    def find_by_yds_range(cls, yds_min, yds_max):
-        sql = """
-            SELECT *
-            FROM yarns
-            WHERE (yds * qty) BETWEEN ? AND ?
-        """
-
-        rows = CURSOR.execute(sql, (yds_min, yds_max)).fetchall()
-        return [cls.instance_from_db(row) for row in rows] if rows else []
-
-

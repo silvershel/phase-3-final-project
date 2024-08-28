@@ -1,4 +1,5 @@
 # lib/cli.py
+
 from helpers import (
     clear_terminal,
     exit_program,
@@ -9,6 +10,7 @@ from helpers import (
     update_yarn,
     delete_yarn,
     list_projects,
+    find_project_by_category,
     find_project_by_weight,
     add_project,
     update_project,
@@ -44,10 +46,11 @@ def project_menu():
     print("PROJECTS")
     print()
     print("1. List all projects")
-    print("2. Find project by yarn weight")
+    print("2. Find projects by category")
+    print("3. Find projects by yarn weight")
     print("4: Add a project")
-    print("3: Update a project")
-    print("4: Delete a project")
+    print("5: Update a project")
+    print("6: Delete a project")
     print()
     print("EXIT to exit | MAIN for Main Menu")
     print()
@@ -98,12 +101,14 @@ def main():
                 elif choice == "1":
                     list_projects()
                 elif choice == "2":
-                    find_project_by_weight()
+                    find_project_by_category()
                 elif choice == "3":
-                    add_project()
+                    find_project_by_weight()
                 elif choice == "4":
-                    update_project()
+                    add_project()
                 elif choice == "5":
+                    update_project()
+                elif choice == "6":
                     delete_project()
                 else:
                     clear_terminal()
