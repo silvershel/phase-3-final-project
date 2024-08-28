@@ -22,7 +22,7 @@ class Yarn:
             return repr
         else:
             project = Project.find_by_id(self.project_id)
-            repr += f"Being used for {project.pattern}.\n"
+            repr += f"Being used for: {project.pattern}.\n"
             return repr
 
     @property

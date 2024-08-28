@@ -16,7 +16,7 @@ from models.yarn import Yarn
 # Mark yarn as unavailable if in use by another project. 
 
 
-# HELPER FUNCTIONS
+# CLEANUP FUNCTIONS
 def clear_terminal():
     if os.name == 'nt':
         os.system('cls')
