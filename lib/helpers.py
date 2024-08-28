@@ -4,17 +4,15 @@ import os
 from models.project import Project
 from models.yarn import Yarn
 
-# TO DO
-# Title case check (Farmer's going to Farmer'S).
-# List yarn used under each project.
-
-# STRETCH
+# ADDITIONAL GOALS
 # YARN - Add color_family
 # YARN - Add find_by_color_family
 # YARN - add logic to alphebetize all_yarn list by color within each brand
+# Title case check ("Farmer's" going to "Farmer'S").
 # Be able to connect yarn to a new project based on multiple attributes instead of just weight.
 # Be able to skip input fields.
 # Be able to exit out of input fields.
+# List yarn used under each project.
 # Mark yarn as unavailable if in use by another project. 
 
 
