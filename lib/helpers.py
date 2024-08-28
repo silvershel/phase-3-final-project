@@ -5,14 +5,12 @@ from models.project import Project
 from models.yarn import Yarn
 
 # TO DO
-# updating a yarn updates project to somehting (2??) and doesn't leave it blank
-# One to many relationship
-    # Test function to test setting the yarn.project_id to project.id.
-    # Create function add_from_stash()
-
-# When yarn has a project_id:
-    # List project title under each yarn and change format (color?) to highlight, else None.
-    # List yarn used under each project.
+# print yarns added to project 
+# update_yarn connects to stash.
+# no yarn available if in use by another project. 
+# List project title under each yarn and change format (color?) to highlight, else None.
+# List yarn used under each project.
+# List all yarns: add aditional logic to continue alphebetizing by color.
 
 # STRETCH
 # YARN - Add color_family
@@ -189,7 +187,8 @@ def list_projects():
     print_with_return("ALL PROJECTS")
     projects = Project.get_all()
     if projects:
-        for project in projects:
+        sorted_projects = sorted(projects, key=lambda project: project.pattern)
+        for project in sorted_projects:
             print(project)
         print_with_return("Scroll up to view.")
     else:
@@ -231,40 +230,38 @@ def add_project():
 
     try:
         project = Project.create(pattern, category, size, weight, yds_needed)
-
-        while True:
-            connect_yarn = input("Would you like to connect yarn from your stash? (Y/N): ").upper()
-            if connect_yarn == "N":
-                clear_terminal()
-                print(project)
-                break
-            elif connect_yarn == "Y":
-                yarns = Yarn.get_all()
-                matching_yarns = [yarn for yarn in yarns if yarn.weight.lower() == weight.lower()]
-                if matching_yarns:
+        yarns = Yarn.get_all()
+        matching_yarns = [yarn for yarn in yarns if yarn.weight.lower() == weight.lower()]
+        
+        if matching_yarns:
+            while True:
+                connect_yarn = input("Would you like to connect yarn from your stash? (Y/N): ").upper()
+                if connect_yarn == "N":
+                    clear_terminal()
+                    print(project)
+                    break
+                elif connect_yarn == "Y":
+                    clear_terminal()
                     for yarn in matching_yarns:
-                        clear_terminal()
                         print(yarn)
-                        print_with_return("Scroll up to view.")
-
+                    
                     while True:
                         yarn_id = input("Please enter the ID of the yarn you'd like to use: ")
                         yarn = Yarn.find_by_id(yarn_id)
                         if yarn:
                             yarn.project_id = project.id
                             yarn.update()
+                            print_with_return(f"{yarn.brand} {yarn.base}, {yarn.color} connected.")
                         else:
-                            clear_and_print("Yarn not found.")
+                            print("Yarn not found.")
 
                         more_yarn = input("Would you like to add more yarn? (Y/N): ").upper()
                         if more_yarn == "N":
+                            clear_and_print(project, "Scroll up to view.")
                             break
-                else:
-                    print("Print statement if not matching_yarns")
-            else:
-                print("Print statement after first Y/N prompt.")
-                break
-            
+                    break
+                                        
+        else:
             clear_and_print(project, "Scroll up to view.")
 
     except Exception as exc:
