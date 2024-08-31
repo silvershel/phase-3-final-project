@@ -4,6 +4,37 @@ import os
 from models.project import Project
 from models.yarn import Yarn
 
+# CHANGES
+# Show one to many relationship
+    # Selecting Projects automatically lists all projects with project menu underneath
+        # 1. Project One
+        # 2. Project Two
+        # Enter the project number to view details or...
+        # A - Add a project
+        # C - Find projects by Category
+        # W - Find projects by Weight
+        # E - Exit
+        # M - Main Menu
+
+        # Project details.
+            # Project Title
+            # Yarn 1
+            # Yarn 2
+            # A - Add yarn
+            # U - Update
+            # D - Delete
+            # E - Exit
+            # M - Main Menu
+
+
+# STRETCH GOALS
+# Be able to skip input fields.
+# Be able to exit out of input fields.
+# Mark yarn as unavailable if in use by another project
+# PROJECT, Add find by designer
+# YARN, Add color_family
+# YARN, Add find_by_color_family
+
 # CLEANUP FUNCTIONS
 def clear_terminal():
     if os.name == 'nt':
@@ -30,8 +61,10 @@ def capitalize_first_letter(text):
 
 def input_str(field_name):
     while True:
-        value = input(f"Enter the {field_name}: ")
-        if value:
+        value = input(f"Enter the {field_name}: ").lower()
+        if value == "dk":
+            return "DK"
+        elif value:
             return capitalize_first_letter(value)
         else:
             print("Field can not be blank.")
@@ -54,43 +87,39 @@ def select_brand():
         for i, brand in enumerate(brands, start=1):
             print(f"{i}. {brand}")
 
-        user_input = input("\nEnter the brand: ")
+        user_input = input("Enter the brand: ")
         
         if user_input.isdigit() and 1 <= int(user_input) <= len(brands):
-            return brands[int(user_input) - 1]  # Return the selected brand
+            return brands[int(user_input) - 1]
         else:
             clear_and_print("Please enter a valid option.")
 
 
 def select_category():
     while True:
-        category = input("\n1. Garment\n2. Accessory\n3. Other\n\nEnter the project category: ").lower()
-        if category == "1":
-            return "Garment"
-        elif category == "2":
-            return "Accessory"
-        elif category == "3":
-            return "Other"
+        valid_categories = Project.VALID_CATEGORIES
+        
+        for i, weight in enumerate(valid_categories, start=1):
+            print(f"{i}. {weight}")
+
+        user_input = input("Enter the category: ")
+        
+        if user_input.isdigit() and 1 <= int(user_input) <= len(valid_categories):
+            return valid_categories[int(user_input) - 1]
         else:
             clear_and_print("Please enter a valid option.")
 
 def select_weight():
     while True:
-        weight = input("1. Lace\n2. Sock\n3. Sport\n4. DK\n5. Worsted\n6. Aran\n7. Bulky\n\nEnter the yarn weight: ").lower()
-        if weight == "1":
-            return "Lace"
-        elif weight == "2":
-            return "Sock"
-        elif weight == "3":
-            return "Sport"
-        elif weight == "4":
-            return "DK"
-        elif weight == "5":
-            return "Worsted"
-        elif weight == "6":
-            return "Aran"
-        elif weight == "7":
-            return "Bulky"
+        valid_weights = Yarn.VALID_WEIGHTS
+        
+        for i, weight in enumerate(valid_weights, start=1):
+            print(f"{i}. {weight}")
+
+        user_input = input("Enter the weight: ")
+        
+        if user_input.isdigit() and 1 <= int(user_input) <= len(valid_weights):
+            return valid_weights[int(user_input) - 1]
         else:
             clear_and_print("Please enter a valid option.")
                 
@@ -105,7 +134,7 @@ def list_projects():
     if projects:
         sorted_projects = sorted(projects, key=lambda project: project.pattern)
         for i, project in enumerate(sorted_projects, start=1):
-            print(f"{i}. {project.pattern}\n")
+            print_with_return(f"{i}. {project.pattern}")
         print_with_return("Scroll up to view.")
     else:
         print_with_return("No projects in database.")
@@ -120,7 +149,7 @@ def list_projects_by_category():
         clear_terminal()
         sorted_projects = sorted(matching_projects, key=lambda project: project.pattern)
         for i, project in enumerate(sorted_projects, start=1):
-            print(f"{i}. {project.pattern}\n")
+            print_with_return(f"{i}. {project.pattern}")
         print_with_return("Scroll up to view.")
     else:
         clear_and_print(f"No {category} projects in library.")
@@ -135,7 +164,7 @@ def list_projects_by_weight():
         clear_terminal()
         sorted_projects = sorted(matching_projects, key=lambda project: project.pattern)
         for i, project in enumerate(sorted_projects, start=1):
-            print(f"{i}. {project.pattern}\n")
+            print_with_return(f"{i}. {project.pattern}")
         print_with_return("Scroll up to view.")
     else:
         clear_and_print(f"No {weight.lower()} weight projects in library.")
@@ -163,10 +192,10 @@ def update_project():
     enumerated_projects = {}
 
     for i, project in enumerate(sorted_projects, start=1):
-        print(f"{i}.{project.pattern}\nDesigner: {project.designer}\nCategory: {project.category}\nSize: {project.size}\nWeight: {project.weight}\nYds Needed: {project.yds_needed}\n")
+        print_with_return(f"{i}. {project.pattern}")
         enumerated_projects[i] = project
 
-    user_input = input_int("Enter the number of the project you want to update: ")
+    user_input = int(input("Enter the number of the project you want to update: "))
 
     if user_input in enumerated_projects:
         clear_terminal()
@@ -183,13 +212,31 @@ def update_project():
         clear_and_print("Project not found.")
 
 def delete_project():
+    # clear_terminal()
+    # id_ = input("Enter the ID of the project you want to delete: ")
+    # if project := Project.find_by_id(id_):
+    #     clear_and_print(f"Project {project.id} has been deleted.")
+    #     project.delete()
+    # else:
+    #     clear_and_print(f"Project not found.")
     clear_terminal()
-    id_ = input("Enter the ID of the project you want to delete: ")
-    if project := Project.find_by_id(id_):
-        clear_and_print(f"Project {project.id} has been deleted.")
-        project.delete()
+    projects = Project.get_all()
+    sorted_projects = sorted(projects, key=lambda project: project.pattern)
+    enumerated_projects = {}
+
+    for i, project in enumerate(sorted_projects, start=1):
+        print_with_return(f"{i}. {project.pattern}")
+        enumerated_projects[i] = project
+
+    user_input = int(input("Enter the number of the project you want to delete: "))
+
+    if user_input in enumerated_projects:
+        selected_project = Project.find_by_id(enumerated_projects[user_input].id)
+        clear_and_print("Project deleted:", f"{project.pattern}\nDesigner: {project.designer}\nCategory: {project.category}\nSize: {project.size}\nWeight: {project.weight}\nYds Needed: {project.yds_needed}")
+        selected_project.delete()
     else:
-        clear_and_print(f"Project not found.")
+        clear_and_print("Not a valid option.")
+    
 
 # YARN FUNCTIONS        
 def list_yarn():
@@ -221,7 +268,7 @@ def list_yarn_by_weight():
     clear_terminal()
     weight =  select_weight()
     yarns = Yarn.get_all()
-    matching_yarns = [yarn for yarn in yarns if yarn.weight.lower() == weight.lower()]
+    matching_yarns = [yarn for yarn in yarns if yarn.weight == weight]
 
     if matching_yarns:
         clear_terminal()
@@ -230,7 +277,7 @@ def list_yarn_by_weight():
             print(f"{i}. {yarn.brand}, {yarn.base}\nColor: {yarn.color} | Weight: {yarn.weight} | Yds: {yarn.yds} | Qty: {yarn.qty}\n")
         print_with_return("Scroll up to view.")
     else:
-        clear_and_print(f"No {weight.lower()} weight yarn in stash.")
+        clear_and_print(f"No {weight} weight yarn in stash.")
 
 def add_yarn():
     clear_terminal()
@@ -259,7 +306,7 @@ def update_yarn():
         print(f"{i}. {yarn.brand}, {yarn.base}\nColor: {yarn.color} | Weight: {yarn.weight} | Yds: {yarn.yds} | Qty: {yarn.qty}\n")
         enumerated_yarns[i] = yarn
 
-    user_input = input_int("Enter the number of the yarn you want to update: ")
+    user_input = int(input("Enter the number of the yarn you want to update: "))
 
     if user_input in enumerated_yarns:
         clear_terminal()
@@ -285,7 +332,7 @@ def delete_yarn():
         print(f"{i}. {yarn.brand}, {yarn.base}\nColor: {yarn.color} | Weight: {yarn.weight} | Yds: {yarn.yds} | Qty: {yarn.qty}\n")
         enumerated_yarns[i] = yarn
 
-    user_input = input_int("Enter the number of the yarn you want to delete: ")
+    user_input = int(input("Enter the number of the yarn you want to delete: "))
 
     if user_input in enumerated_yarns:
         selected_yarn = Yarn.find_by_id(enumerated_yarns[user_input].id)

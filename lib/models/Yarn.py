@@ -2,7 +2,7 @@
 from models.__init__ import CURSOR, CONN
 
 class Yarn:
-    
+    VALID_WEIGHTS = ["Lace", "Sock", "Sport", "DK", "Worsted", "Aran", "Bulky"]
     all = {}
 
     def __init__(self, brand, base, color, weight, yds, qty, project_id=None, id=None):
@@ -54,10 +54,10 @@ class Yarn:
     
     @weight.setter
     def weight(self, weight):
-        if type(weight) is str and len(weight) > 0:
+        if weight in Yarn.VALID_WEIGHTS:
             self._weight = weight
         else:
-            raise ValueError("Weight must be a non-empty string.")
+            raise ValueError("Invalid weight")
 
     @property
     def yds(self):

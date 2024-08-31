@@ -3,7 +3,7 @@ from models.__init__ import CURSOR, CONN
 from models.yarn import Yarn
 
 class Project:
-
+    VALID_CATEGORIES = ["Garment", "Accessory", "Other"]
     all = {}
     
     def __init__(self, pattern, deisgner, category, size, weight, yds_needed, id=None):
@@ -43,7 +43,7 @@ class Project:
     
     @category.setter
     def category(self, category):
-        if isinstance(category, str) and len(category) > 0:
+        if category in Project.VALID_CATEGORIES:
             self._category = category
 
     @property
