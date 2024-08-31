@@ -1,6 +1,5 @@
 # lib/models/yarn.py
 from models.__init__ import CURSOR, CONN
-from models.project import Project
 
 class Yarn:
     
@@ -8,22 +7,13 @@ class Yarn:
 
     def __init__(self, brand, base, color, weight, yds, qty, project_id=None, id=None):
         self.id = id
-        self.brand = brand.title()
-        self.base = base.title()
-        self.color = color.title()
-        self.weight = weight.title()
+        self.brand = brand
+        self.base = base
+        self.color = color
+        self.weight = weight
         self.yds = yds
         self.qty = qty
         self.project_id = project_id
-
-    def __repr__(self):
-        repr = f"{self.brand}, {self.base}\nColor: {self.color} | Weight: {self.weight} | Yds: {self.yds} | Qty: {self.qty}\nID: {self.id}\n"
-        if self.project_id == None:
-            return repr
-        else:
-            project = Project.find_by_id(self.project_id)
-            repr += f"Being used for: {project.pattern}.\n"
-            return repr
 
     @property
     def brand(self):
@@ -32,7 +22,7 @@ class Yarn:
     @brand.setter
     def brand(self, brand):
         if isinstance(brand, str) and len(brand) > 0:
-            self._brand = brand.title()
+            self._brand = brand
         else:
             raise ValueError("Brand must be a non-empty string.")
     
@@ -43,7 +33,7 @@ class Yarn:
     @base.setter
     def base(self, base):
         if isinstance(base, str) and len(base) > 0:
-            self._base = base.title()
+            self._base = base
         else:
             raise ValueError("Base must be a non-empty string.")
 
@@ -54,7 +44,7 @@ class Yarn:
     @color.setter
     def color(self, color):
         if isinstance(color, str) and len(color) > 0:
-            self._color = color.title()
+            self._color = color
         else:
             raise ValueError("Color must be a non-empty string.")
 
@@ -65,7 +55,7 @@ class Yarn:
     @weight.setter
     def weight(self, weight):
         if type(weight) is str and len(weight) > 0:
-            self._weight = weight.title()
+            self._weight = weight
         else:
             raise ValueError("Weight must be a non-empty string.")
 
@@ -208,3 +198,13 @@ class Yarn:
         """
         row = CURSOR.execute(sql, (id,)).fetchone()
         return cls.instance_from_db(row) if row else None
+    
+    @classmethod
+    def find_by_project_id(cls, project_id):
+        sql = """
+            SELECT *
+            FROM yarns
+            WHERE project_id = ?
+        """
+        rows = CURSOR.execute(sql, (project_id,)).fetchall()
+        return [cls.instance_from_db(row) for row in rows]

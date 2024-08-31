@@ -1,20 +1,19 @@
 # lib/models/project.py
 from models.__init__ import CURSOR, CONN
+from models.yarn import Yarn
 
 class Project:
 
     all = {}
     
-    def __init__(self, pattern, category, size, weight, yds_needed, id=None):
+    def __init__(self, pattern, deisgner, category, size, weight, yds_needed, id=None):
         self.id = id
-        self.pattern = pattern.title()
-        self.category = category.title()
+        self.pattern = pattern
+        self.designer = deisgner
+        self.category = category
         self.size = size
-        self.weight = weight.title()
+        self.weight = weight
         self.yds_needed = yds_needed
-
-    def __repr__(self):
-        return f"Pattern: {self.pattern}\nCategory: {self.category}\nSize: {self.size}\nWeight: {self.weight}\nYds Needed: {self.yds_needed}\nID: {self.id}\n"
 
     @property
     def pattern(self):
@@ -23,7 +22,18 @@ class Project:
     @pattern.setter
     def pattern(self, pattern):
         if isinstance(pattern, str) and len(pattern):
-            self._pattern = pattern.title()
+            self._pattern = pattern
+        else:
+            raise ValueError("Pattern name must be a non-empty string.")
+        
+    @property
+    def designer(self):
+        return self._designer
+    
+    @designer.setter
+    def designer(self, designer):
+        if isinstance(designer, str) and len(designer):
+            self._designer = designer
         else:
             raise ValueError("Pattern name must be a non-empty string.")
         
@@ -34,7 +44,7 @@ class Project:
     @category.setter
     def category(self, category):
         if isinstance(category, str) and len(category) > 0:
-            self._category = category.title()
+            self._category = category
 
     @property
     def size(self):
@@ -43,7 +53,7 @@ class Project:
     @size.setter
     def size(self, size):
         if isinstance(size, str) and len(size) > 0:
-            self._size = size.title()
+            self._size = size
 
     @property
     def weight(self):
@@ -52,7 +62,7 @@ class Project:
     @weight.setter
     def weight(self, weight):
         if isinstance(weight, str) and len(weight) > 0:
-            self._weight = weight.title()
+            self._weight = weight
 
     @property
     def yds_needed(self):
@@ -75,6 +85,7 @@ class Project:
                 CREATE TABLE IF NOT EXISTS projects (
                 id INTEGER PRIMARY KEY,
                 pattern TEXT,
+                designer TEXT,
                 category TEXT,
                 size TEXT,
                 weight TEXT,
@@ -94,10 +105,10 @@ class Project:
     def save(self):
         Project.create_table()
         sql = """
-            INSERT INTO projects (pattern, category, size, weight, yds_needed)
-            VALUES (?, ?, ?, ?, ?)
+            INSERT INTO projects (pattern, designer, category, size, weight, yds_needed)
+            VALUES (?, ?, ?, ?, ?, ?)
         """
-        CURSOR.execute(sql, (self.pattern, self.category, self.size, self.weight, self.yds_needed))
+        CURSOR.execute(sql, (self.pattern, self.designer, self.category, self.size, self.weight, self.yds_needed))
         CONN.commit()
 
         self.id = CURSOR.lastrowid
@@ -106,10 +117,10 @@ class Project:
     def update(self):
         sql = """
             UPDATE projects
-            SET pattern = ?, category = ?, size = ?, weight = ?, yds_needed = ?
+            SET pattern = ?, designer = ?, category = ?, size = ?, weight = ?, yds_needed = ?
             WHERE id = ?
         """
-        CURSOR.execute(sql, (self.pattern, self.category, self.size, self.weight, self.yds_needed, self.id))
+        CURSOR.execute(sql, (self.pattern, self.designer, self.category, self.size, self.weight, self.yds_needed, self.id))
         CONN.commit()
 
     def delete(self):
@@ -123,8 +134,8 @@ class Project:
         self.id = None
 
     @classmethod
-    def create(cls, pattern, category, size, weight, yds_needed):
-        project = cls(pattern, category, size, weight, yds_needed)
+    def create(cls, pattern, designer, category, size, weight, yds_needed):
+        project = cls(pattern, designer, category, size, weight, yds_needed)
         project.save()
         return project
 
@@ -133,12 +144,13 @@ class Project:
         project = cls.all.get(row[0])
         if project:
             project.pattern = row[1]
-            project.category = row[2]
-            project.size = row[3]
-            project.weight = row[4]
-            project.yds_needed = row[5]
+            project.designer = row[2]
+            project.category = row[3]
+            project.size = row[4]
+            project.weight = row[5]
+            project.yds_needed = row[6]
         else:
-            project = cls(row[1], row[2], row[3], row[4], row[5], id=row[0])
+            project = cls(row[1], row[2], row[3], row[4], row[5], row[6], id=row[0])
             cls.all[project.id] = project
         return project
 
@@ -161,22 +173,5 @@ class Project:
         row = CURSOR.execute(sql, (id,)).fetchone()
         return cls.instance_from_db(row) if row else None
     
-    @classmethod
-    def find_by_category(cls, category):
-        sql = """
-            SELECT *
-            FROM projects
-            WHERE category = ?
-        """
-        row = CURSOR.execute(sql, (id,)).fetchone()
-        return cls.instance_from_db(row) if row else None
-
-    @classmethod
-    def find_by_yarn_weight(cls, weight):
-        sql = """
-            SELECT *
-            FROM projects
-            WHERE weight is ?
-        """
-        row = CURSOR.execute(sql, (weight,)).fetchone()
-        return cls.instance_from_db(row) if row else None
+    def yarns(self):
+        return Yarn.find_by_project_id(self.id)
