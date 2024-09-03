@@ -17,6 +17,7 @@ from models.yarn import Yarn
 # Fix clearing issues for adding yarn to a project (just clears and shows menu again)
 # Fix selecting wrong number from adding a yarn (just clears and shows menu again)
 # Fix selecting wrong number from removing a yarn (error exits out of program)
+# when deleted, show message (project had been deleted)
 
 # YARN MENU TO DO
 # Fix delete yarn
@@ -132,7 +133,8 @@ def list_all_projects():
     if projects:
         sorted_projects = sorted(projects, key=lambda project: project.pattern)
         for i, project in enumerate(sorted_projects, start=1):
-            print_with_return(f"{i}. {project.pattern}")
+            print(f"{i}. {project.pattern}")
+        print()
     else:
         print_with_return("No projects in database.")
 
