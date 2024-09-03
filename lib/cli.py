@@ -1,48 +1,70 @@
 # lib/cli.py
-
+from models.project import Project
+from models.yarn import Yarn
 from helpers import (
     clear_terminal,
+    clear_and_print,
+    print_with_return,
     exit_program,
+    list_all_projects,
+    list_one_project,
+    add_project,
+    update_project,
+    add_yarn_to_project,
+    remove_yarn_from_project,
+    delete_project,
     list_yarn,
+    list_yarn_used,
     list_yarn_by_brand,
     list_yarn_by_weight,
     add_yarn,
     update_yarn,
     delete_yarn,
-    list_projects,
-    list_projects_by_category,
-    list_projects_by_weight,
-    add_project,
-    update_project,
-    delete_project
 )
 
 def main_menu():
-    print("----- \n")
+    print("-----")
+    print()
     print("STASH MANAGER")
     print()
     print("1. Projects")
     print("2. Yarn")
+    print("3. Needles (coming soon)")
     print()
-    print("E to exit")
+    print("E to Exit")
+    print()
+
+def projects_menu():
+    print("-----")
+    print()
+    print("Enter the project number to view details, edit, or delete.")
+    print("Type A to add a project.")
+    print()
+    print("B go Back | E to Exit")
+    
     print()
 
 def project_menu():
-    print("----- \n")
-    print("PROJECTS")
+    print("-----")
     print()
-    print("1. List all projects")
-    print("2. Find projects by category")
-    print("3. Find projects by yarn weight")
-    print("4: Add a project")
-    print("5: Update a project")
-    print("6: Delete a project")
+    print("Type A to add yarn to project.")
+    print("Type R to remove yarn from project.")
+    print("Type U to update details.")
+    print("Type D to delete.")
     print()
-    print("E to exit | M for Main Menu")
+    print("B go Back | E to Exit")
+    print()
+
+def mini_menu():
+    print("-----")
+    print()
+    print("Enter a number to select.")
+    print("B go Back | E to Exit")
     print()
 
 def yarn_menu():
-    print("----- \n")
+    print("-----")
+    print()
     print("YARN")
     print()
     print("1. List all yarn")
@@ -52,9 +74,24 @@ def yarn_menu():
     print("5: Update yarn")
     print("6: Delete yarn")
     print()
-    print("E to exit | M for Main Menu")
+    print("B go Back | E to Exit")
     print()
 
+# MENU NESTING FORMAT
+# if choice is "something":
+    # clear_terminal
+    # while True:
+        # menu to list
+        # anything else to list 
+        # choice = input("> ").upper()
+        # if choice == "something":
+            # action to take
+        # elif choice == "something else":
+            # action to take
+        # else:
+            # print("Please select a valid option.")
+# else:
+    # print("Please select a valid option.")
 
 def main():
     clear_terminal()
@@ -64,29 +101,84 @@ def main():
         if choice == "1":
             clear_terminal()
             while True:
-                project_menu()
+                print_with_return("ALL PROJECTS")
+                list_all_projects()
+                projects_menu()
                 choice = input("> ").upper()
-                if choice == "E":
-                    clear_terminal()
-                    exit_program()
-                elif choice == "M":
+                if choice == "A":
+                    add_project()
+                elif choice == "B":
                     clear_terminal()
                     break
-                elif choice == "1":
-                    list_projects()
-                elif choice == "2":
-                    list_projects_by_category()
-                elif choice == "3":
-                    list_projects_by_weight()
-                elif choice == "4":
-                    add_project()
-                elif choice == "5":
-                    update_project()
-                elif choice == "6":
-                    delete_project()
-                else:
+                elif choice == "E":
                     clear_terminal()
-                    print("Please select a valid option.\n")
+                    exit_program()
+                elif choice.isdigit():
+                    user_input = int(choice)
+                    projects = Project.get_all()
+                    if 1 <= user_input <= len(projects):
+                        clear_terminal()
+                        while True: 
+                            print_with_return("PROJECT DETAILS")
+                            list_one_project(user_input)
+                            project_menu()
+                            choice = input("> ").upper()
+                            if choice == "B":
+                                clear_terminal()
+                                break
+                            elif choice == "D":
+                                delete_project(user_input)
+                                break
+                            elif choice == "E":
+                                clear_terminal()
+                                exit_program()
+                                break
+                            elif choice == "U":
+                                update_project(user_input)
+                            elif choice == "A":
+                                clear_terminal()
+                                while True: 
+                                    list_yarn()
+                                    mini_menu()
+                                    choice = input("> ").upper()  
+                                    if choice == "B":
+                                        clear_terminal()
+                                        break
+                                    elif choice == "E":
+                                        clear_terminal()
+                                        exit_program()
+                                    elif choice.isdigit():
+                                        yarns = Yarn.get_all()
+                                        yarn_input = int(choice)
+                                        if 1 <= yarn_input <= len(yarns):
+                                            add_yarn_to_project(user_input, yarn_input)  
+                                        else:
+                                            print("Please select a valid option.")
+                                    else:
+                                        print("Please select a valid option.")
+                                    
+                            elif choice == "R":         
+                                while True:
+                                    list_yarn_used(user_input)
+                                    mini_menu()
+                                    choice = input("> ").upper()
+                                    if choice.isdigit():
+                                        yarn_input = choice
+                                        remove_yarn_from_project(user_input, yarn_input)
+                                    elif choice == "B":
+                                        clear_terminal()
+                                        break
+                                    elif choice == "E":
+                                        clear_terminal()
+                                        exit_program()
+                                    else:
+                                        clear_and_print("Please select a valid option.")
+                            else:
+                                clear_and_print("Please select a valid option.")
+                    else:
+                        clear_and_print("Please select a valid option.") 
+                else:
+                    clear_and_print("Please select a valid option.")
         elif choice == "2":
             clear_terminal()
             while True:
@@ -95,7 +187,7 @@ def main():
                 if choice == "E":
                     clear_terminal()
                     exit_program()
-                elif choice == "M":
+                elif choice == "B":
                     clear_terminal()
                     break
                 elif choice == "1":
@@ -111,14 +203,26 @@ def main():
                 elif choice == "6":
                     delete_yarn()
                 else:
+                    clear_and_print("Please select a valid option.")
+        elif choice == "3":
+            clear_and_print("COMING SOON")
+            while True:
+                mini_menu()
+                choice = input("> ").upper()
+                if choice == "B":
                     clear_terminal()
-                    print("Please select a valid option.\n")
+                    break
+                elif choice == "E":
+                    clear_terminal()
+                    exit_program()
+                else:
+                    clear_and_print("Please select a valid option.")
+
         elif choice == "E":
             clear_terminal()
             exit_program()
         else:
-            clear_terminal()
-            print("Please select a valid option.\n")
+            clear_and_print("Please select a valid option.")
 
 
 if __name__ == "__main__":
