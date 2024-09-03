@@ -1,155 +1,179 @@
 # STASH MANAGER
-### This CLI keeps track of a user's personal yarn stash and related projects by allowing the user to input important details for each yarn or project.
+### This CLI keeps track of a user's knitting projects and yarn stash by allowing the user to input important details for each project and/or yarn.
 
-## CLI MENU (cli.py)
-Organizes the CLI menu and navigates to each category/task based on user inputs. Menus (as visible to the user) are shown below:
+## MENUS
 
 ### Main Menu
+The main menu displays the three main components that make up a knitter's stash: projects, yarn, and needles. Currently this program is only built to handle projects and yarn, but the ability to add needles (and other tools) will be added in the future.
 ```
 STASH MANAGER
 
-1. Yarn
-2. Projects
+1. Projects
+2. Yarn
+3. Needles (coming soon)
 
-EXIT to exit
-
-> 
-```
-
-### Yarn Menu
-```
-YARN
-
-1. List all yarn
-2. Find yarn by brand
-3. Find yarn by weight
-4: Add yarn
-5: Update yarn
-6: Delete yarn
-
-EXIT to exit | MAIN for Main Menu
+E to Exit
 
 > 
 ```
 
-### Projects Menu
+### Main Menu > Projects Menu
+The projects menu displays all of the user's current projects. From this menu, the user can enter any number to view, edit, or delete that project, or enter "A" to add a new project to the list.
 ```
-PROJECTS
+ALL PROJECTS
 
-1. List all projects
-2. Find projects by category
-3. Find projects by yarn weight
-4: Add a project
-5: Update a project
-6: Delete a project
+1. 4 Letter Sweater
 
-EXIT to exit | MAIN for Main Menu
+2. Shifty Sweater
+
+-----
+
+Enter the project number to view details, edit, or delete.
+Type A to add a project.
+
+B go Back | E to Exit
 
 > 
 ```
 
-
-## YARN CLASS (yarn.py)
-This class includes methods that allow the user to add, update, and delete a yarn and places the corresponding data into a table. Each table includes colums for important details including the yarn brand, base, color, weight, yards per skein (yds), and total number of skeins (qty).
-
-
-## PROJECT CLASS (project.py)
-This class includes methods that allow the user to add, update, and delete a project and places the corresponding data into a table. Each table includes colums for important details including the pattern name (pattern), category, size being made (size), yarn weight (weight), and total yards needed (yds_needed).
-
-## HELPER FUNCTIONS (helpers.py)
-
-### Cleanup Functions
-Used to simplify code blocks, check inputs, and prompt user with instructions. 
-
-```clear_terminal(), clear_and_print(), print_with_return()```
-Various clear and print functions to maintain a clean user experience.
-
-```input_str(), input_int()``` Checks inputs for correct data types.
-
-```check_brand()```
-Checks the input for a match based on brands listed in the database.
-
-```check_category()```
-Checks the input for a match based on a list of of pre-determined categories.
-
-```check_weight()```
-Checks the input for a match based on a list of of pre-determined yarn weights.
-
-```exit_program()```
-Exits the program. 
-
-### Yarn Functions
-Functions related specifically to the Yarn class.
-
-```list_yarn()```
-Lists all yarn in the database alphebetically by brand. 
-
-```find_yarn_by_brand(), find_yarn_by_weight()```
-Based on user input, finds and prints every yarn in the database that matches each function's specific criteria (brand or weight). Example:
-
+### Main Menu > Projects Menu > Project Details
+When the user selects a project, the details of that project are displayed along with any yarn being used for that project. From there the user can carry out the tasks mentioned previously including adding yarn, removing yarn, updating that project's details, or deleting the project.
 ```
-ALL YARN (alphabetical by brand)
+PROJECT DETAILS
 
-De Rerum Natura, Dilliatt
-Color: Tempete | Weight: Dk | Yds: 273 | Qty: 5
-ID: 1
-Being used for: 4 Letter Sweater.
+4 Letter Sweater
+Designer: Degen
+Category: Garment
+Size: Small
+Weight: Worsted
+Yds Needed: 1200
 
-De Rerum Natura, Gilliatt
+YARNS USING:
+De Rerum Natura Gilliatt, Tempete
+De Rerum Natura Gilliatt, Caramel
+
+-----
+
+Type A to add yarn to project.
+Type R to remove yarn from project.
+Type U to update details.
+Type D to delete.
+
+B go Back | E to Exit
+
+>  
+```
+### Main Menu > Projects Menu > Project Details > Add Yarn
+When the user selects "A" to add yarn, all yarn will be listed. The user can enter any number from this list to add that yarn to the project.
+```
+ALL YARN
+
+1. De Rerum Natura, Gilliatt
+Color: Tempete | Weight: Worsted | Yds: 273 | Qty: 5
+
+2. De Rerum Natura, Gilliatt
 Color: Caramel | Weight: Worsted | Yds: 273 | Qty: 1
-ID: 3
-Being used for: 4 Letter Sweater.
 
-Spincycle, Metamorphic
-Color: Marl No. 29 | Weight: Dk | Yds: 400 | Qty: 3
-ID: 2
+3. De Rerum Natura, Gilliatt
+Color: Genet | Weight: Worsted | Yds: 273 | Qty: 2
+
+4. De Rerum Natura, Gillatt
+Color: Bouleau | Weight: Worsted | Yds: 273 | Qty: 1
+
+5. De Rerum Natura, Gilliatt
+Color: Sel | Weight: Worsted | Yds: 273 | Qty: 1
+
+6. Farmer's Daughter Fibers, Pishkun
+Color: Ranch Romance | Weight: DK | Yds: 250 | Qty: 3
+
+7. Spincycle, Metamorphic
+Color: Marl No. 29 | Weight: DK | Yds: 400 | Qty: 3
+
+8. Spincycle, Dyed In The Wool
+Color: Mississippi Marsala | Weight: Sport | Yds: 200 | Qty: 2
+
+9. Spincycle, Dyed In The Wool
+Color: Wololo | Weight: Sport | Yds: 200 | Qty: 2
 
 Scroll up to view.
 
------ 
+-----
 
+Enter the yarn number to select.
+B go Back | E to Exit
+
+> 
+```
+### Main Menu > Projects Menu > Project Details > Remove Yarn
+When the user selects "R" to remove yarn, only the yarn being used for that project will be listed. The user can select any number from this list to remove that yarn.
+```
+USED YARN
+
+1. De Rerum Natura, Gilliatt
+Color: Tempete | Weight: Worsted | Yds: 273 | Qty: 5
+
+2. De Rerum Natura, Gilliatt
+Color: Caramel | Weight: Worsted | Yds: 273 | Qty: 1
+
+-----
+
+Enter the yarn number to select.
+B go Back | E to Exit
+
+> 
+```
+### Main Menu > Projects Menu > Add Project
+### Main Menu > Projects Menu > Project Details > Update Details
+Whether adding a project or updating the details for a project, the user will be prompted to fill out a field for each project detail. The "category" and "yarn weight" fields are limited by specific selections, the other fields are open to any input to maintain flexibility for the user. After completing all fields, the user will be taken back to view the project details.
+```
+Enter the pattern name: Pattern Name
+Enter the designer: Designer Name
+1. Garment
+2. Accessory
+3. Other
+Enter the category: 1
+Enter the size being made: Medium
+1. Lace
+2. Sock
+3. Sport
+4. DK
+5. Worsted
+6. Aran
+7. Bulky
+Enter the weight: 5
+Enter the yds needed: 1200
+
+>  
+```
+### Main Menu > Projects Menu > Project Details > Delete
+When the user selects "D" to delete a project, that project will be deleted from the database. The user will be brought back to the main list of projects showing that the project has been deleted.
+```
+ALL PROJECTS
+
+1. 4 Letter Sweater
+
+-----
+
+Enter the project number to view details, edit, or delete.
+Type A to add a project.
+
+B go Back | E to Exit
+
+> 
+```
+### Yarn Menu
+From the yarn menu, the user can select a corresponding number to list all yarn, list yarn by brand, list yarn by weight, add yarn, update yarn, or delete yarn. The yarn lists and prompts to add or update yarn appear in the same format as in the project editor.
+```
 YARN
 
 1. List all yarn
-2. Find yarn by brand
-3. Find yarn by weight
+2. List yarn by brand
+3. List yarn by weight
 4: Add yarn
 5: Update yarn
 6: Delete yarn
 
-EXIT to exit | MAIN for Main Menu
+B go Back | E to Exit
 
-> 
+>  
 ```
-
-```add_yarn()```
-Allows the user to add a new yarn to the database and assigns important details including: brand, base, color, weight, yds, and qty.
-
-```update_yarn()```
-Allows the user to update the data for a specific yarn including: brand, base, color, weight, yds, qty, and (if applicable) a related project id.
-
-```delete_yarn()```
-Allows the user to manually delete a specific yarn.
-
-### Project Functions
-Functions related specifically to the Project class. 
-
-```list_projects()```
-Lists all projects in the database alphebetically by pattern name. 
-
-```find_project_by_category(), find_project_by_weight()```
-Based on user input, finds and prints every project in the database that matches each function's specific criteria (category or weight).
-
-```add_project()```
-Allows the user to add a new project to the database and assigns important details including: pattern, category, size, weight, and yards needed. The user can also look for and assign the project id to yarns in their stash to mark for use.
-
-```update_project()```
-Allows the user to update the data for a specific project including: pattern, category, size, weight, and yards needed.
-
-```delete_project()```
-Allows the user to manually delete a specific project.
-
-
-## License
-
-[Link](https://choosealicense.com/licenses/mit/)
