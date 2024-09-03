@@ -5,31 +5,36 @@ from models.project import Project
 from models.yarn import Yarn
 
 # GENERAL TO DO
-    # Reformat cli.py to match displayed menu.
-    # Make sure headings are consistent.
-        # List yarn by brand, no header
-        # List yarn by weight, no header
-        # Update yarn, no header
-        # Delete yarn, no header
-    # Make sure indexing is consisten (pick numbers or letters, not both.)
+# Error handling
+# Make sure headers are consistent
+# Think about where "------" goes in menu vs after code execution.
 
 # PROJECT MENU TO DO
 # Fix clearing issues for adding yarn to a project (just clears and shows menu again)
 # Fix selecting wrong number from adding a yarn (just clears and shows menu again)
 # Fix selecting wrong number from removing a yarn (error exits out of program)
-# when deleted, show message (project had been deleted)
+# When deleted, show message (project had been deleted)
+# Fix add project
+    # Be able to exit out of input fields
 
 # YARN MENU TO DO
-# Fix delete yarn
-    # non-integer exits program.
-    # wrong intger shows "not a valid option" so just make sure language is consistent.
-    # Stay on same page to keep deleting until user selects goes back.
-# Fix update yarn (same issues as above)
+# List yarn by brand (no space after listed yarn before input)
+# List yarn by weight (no space after listed yarn before input)
 # Fix add yarn
+    # Be able to exit out of input fields
+# Fix update yarn
+    # non-integer exits program
+    # wrong intger shows "not a valid option" so just make sure language is consistent
+    # Add bottom menu to go back or exit
+    # Be able to skip input fields
+    # Be able to exit out of input fields
+# Fix delete yarn
+    # non-integer exits program
+    # wrong intger shows "not a valid option" so just make sure language is consistent
+    # Add bottom menu to go back or exit
+    # Stay on same page to keep deleting until user selects goes back
 
 # STRETCH GOALS
-# Be able to skip input fields.
-# Be able to exit out of input fields.
 # Mark yarn as unavailable if in use by another project.
 # PROJECT, Add find by designer
 # YARN, Add color_family
@@ -134,7 +139,6 @@ def list_all_projects():
         sorted_projects = sorted(projects, key=lambda project: project.pattern)
         for i, project in enumerate(sorted_projects, start=1):
             print(f"{i}. {project.pattern}")
-        print()
     else:
         print_with_return("No projects in database.")
 
@@ -147,18 +151,17 @@ def list_one_project(user_input):
     
     if 1 <= user_input <= len(projects):
         if not matching_yarns:
-            print(f"{selected_project.pattern}\nDesigner: {selected_project.designer}\nCategory: {selected_project.category}\nSize: {selected_project.size}\nWeight: {selected_project.weight}\nYds Needed: {selected_project.yds_needed}\n")
+            print(f"{selected_project.pattern}\nDesigner: {selected_project.designer}\nCategory: {selected_project.category}\nSize: {selected_project.size}\nWeight: {selected_project.weight}\nYds Needed: {selected_project.yds_needed}")
         else: 
-            print(f"{selected_project.pattern}\nDesigner: {selected_project.designer}\nCategory: {selected_project.category}\nSize: {selected_project.size}\nWeight: {selected_project.weight}\nYds Needed: {selected_project.yds_needed}\n")
+            print_with_return(f"{selected_project.pattern}\nDesigner: {selected_project.designer}\nCategory: {selected_project.category}\nSize: {selected_project.size}\nWeight: {selected_project.weight}\nYds Needed: {selected_project.yds_needed}")
             print("YARNS USING:")
             for yarn in matching_yarns:
                 print(f"{yarn.brand} {yarn.base}, {yarn.color}")
-            print()
     else:
         clear_and_print("Project not found.")
 
 def add_project():
-    clear_terminal()
+    clear_and_print("NEW PROJECT")
     pattern = input_str("pattern name")
     designer = input_str("designer")
     category = select_category()
@@ -168,19 +171,17 @@ def add_project():
 
     try:
         Project.create(pattern, designer, category, size, weight, yds_needed)
-        clear_terminal()
 
     except Exception as exc:
         clear_and_print("Error adding new project: ", exc)
 
 def update_project(user_input):
-    clear_terminal()
     projects = Project.get_all()
     sorted_projects = sorted(projects, key=lambda project: project.pattern)
     selected_project = Project.find_by_id(sorted_projects[user_input - 1].id)
     
     if selected_project in projects:
-        clear_terminal()
+        clear_and_print("PROJECT DETAILS")
         selected_project.pattern = input_str("pattern name")
         selected_project.designer = input_str("designer")
         selected_project.category = select_category()
@@ -188,7 +189,6 @@ def update_project(user_input):
         selected_project.weight =  select_weight()
         selected_project.yds_needed = input_int("yds needed")                  
         selected_project.update()
-        clear_terminal()
     else:
         clear_and_print("Project not found.")
 
@@ -205,9 +205,8 @@ def delete_project(user_input):
 
     if selected_project in projects:
         selected_project.delete()
-        clear_terminal()
     else:
-        print("cannot delete. project not here.")
+        print("Cannot delete. Project not found.")
 
 def add_yarn_to_project(user_input, yarn_input):
     projects = Project.get_all()
@@ -238,13 +237,13 @@ def remove_yarn_from_project(user_input, yarn_input):
     
 
 # YARN FUNCTIONS        
-def list_yarn():
+def list_all_yarn():
     clear_and_print("ALL YARN")
     yarns = Yarn.get_all()
     if yarns:
         sorted_yarns = sorted(yarns, key=lambda yarn: yarn.brand)
         for i, yarn in enumerate(sorted_yarns, start=1):
-            print(f"{i}. {yarn.brand}, {yarn.base}\nColor: {yarn.color} | Weight: {yarn.weight} | Yds: {yarn.yds} | Qty: {yarn.qty}\n")
+            print_with_return(f"{i}. {yarn.brand}, {yarn.base}\nColor: {yarn.color} | Weight: {yarn.weight} | Yds: {yarn.yds} | Qty: {yarn.qty}")
         print_with_return("Scroll up to view.")
     else:
         print_with_return("No yarn in stash.")
@@ -278,36 +277,34 @@ def list_yarn_used(user_input):
 #         print_with_return("No yarn being used.")
 
 def list_yarn_by_brand():
-    clear_terminal()
+    clear_and_print("YARN BRANDS")
     brand = select_brand()
     yarns = Yarn.get_all()
     matching_yarns = [yarn for yarn in yarns if yarn.brand.lower() == brand.lower()]
     
     if matching_yarns:
-        clear_terminal()
+        clear_and_print(f"{matching_yarns[0].brand.upper()}")
         for i, yarn in enumerate(matching_yarns, start=1):
-            print(f"{i}. {yarn.brand}, {yarn.base}\nColor: {yarn.color} | Weight: {yarn.weight} | Yds: {yarn.yds} | Qty: {yarn.qty}\n")
-        print_with_return("Scroll up to view.")
+            print_with_return(f"{i}. {yarn.brand}, {yarn.base}\nColor: {yarn.color} | Weight: {yarn.weight} | Yds: {yarn.yds} | Qty: {yarn.qty}")
     else:
         clear_and_print(f"Brand not found.")
 
 def list_yarn_by_weight():
-    clear_terminal()
+    clear_and_print("YARN WEIGHTS")
     weight =  select_weight()
     yarns = Yarn.get_all()
     matching_yarns = [yarn for yarn in yarns if yarn.weight == weight]
 
     if matching_yarns:
-        clear_terminal()
+        clear_and_print(f"{matching_yarns[0].weight.upper()} WEIGHT YARH")
         sorted_yarns = sorted(matching_yarns, key=lambda yarn: yarn.brand)
         for i, yarn in enumerate(sorted_yarns, start=1):
-            print(f"{i}. {yarn.brand}, {yarn.base}\nColor: {yarn.color} | Weight: {yarn.weight} | Yds: {yarn.yds} | Qty: {yarn.qty}\n")
-        print_with_return("Scroll up to view.")
+            print_with_return(f"{i}. {yarn.brand}, {yarn.base}\nColor: {yarn.color} | Weight: {yarn.weight} | Yds: {yarn.yds} | Qty: {yarn.qty}")
     else:
         clear_and_print(f"No {weight} weight yarn in stash.")
 
 def add_yarn():
-    clear_terminal()
+    clear_and_print("YARN DETAILS")
     brand = input_str("brand")
     base = input_str("base")
     color = input_str("color")
@@ -318,25 +315,25 @@ def add_yarn():
 
     try:
         yarn = Yarn.create(brand, base, color, weight, yds, qty, project_id)
-        clear_and_print(f"{yarn.brand}, {yarn.base}\nColor: {yarn.color} | Weight: {yarn.weight} | Yds: {yarn.yds} | Qty: {yarn.qty}", "Scroll up to view.")
+        clear_and_print("YARN ADDED", f"{yarn.brand}, {yarn.base}\nColor: {yarn.color} | Weight: {yarn.weight} | Yds: {yarn.yds} | Qty: {yarn.qty}")
 
     except Exception as exc:
         clear_and_print("Error adding new yarn: ", exc)
     
 def update_yarn():
-    clear_terminal()
+    clear_and_print("ALL YARN")
     yarns = Yarn.get_all()
     sorted_yarns = sorted(yarns, key=lambda yarn: yarn.brand)
     enumerated_yarns = {}
 
     for i, yarn in enumerate(sorted_yarns, start=1):
-        print(f"{i}. {yarn.brand}, {yarn.base}\nColor: {yarn.color} | Weight: {yarn.weight} | Yds: {yarn.yds} | Qty: {yarn.qty}\n")
+        print_with_return(f"{i}. {yarn.brand}, {yarn.base}\nColor: {yarn.color} | Weight: {yarn.weight} | Yds: {yarn.yds} | Qty: {yarn.qty}")
         enumerated_yarns[i] = yarn
 
     user_input = int(input("Enter the number of the yarn you want to update: "))
 
     if user_input in enumerated_yarns:
-        clear_terminal()
+        clear_and_print("YARN DETAILS")
         selected_yarn = Yarn.find_by_id(enumerated_yarns[user_input].id)
         selected_yarn.brand = input_str("brand")
         selected_yarn.base = input_str("base")
@@ -345,25 +342,25 @@ def update_yarn():
         selected_yarn.yds = input_int("number of yds per skein")
         selected_yarn.qty = input_int("total number of skeins")                    
         selected_yarn.update()
-        clear_and_print(f"{selected_yarn.brand}, {selected_yarn.base}\nColor: {selected_yarn.color} | Weight: {selected_yarn.weight} | Yds: {selected_yarn.yds} | Qty: {selected_yarn.qty}", "Scroll up to view.")
+        clear_and_print("YARN UPDATED", f"{selected_yarn.brand}, {selected_yarn.base}\nColor: {selected_yarn.color} | Weight: {selected_yarn.weight} | Yds: {selected_yarn.yds} | Qty: {selected_yarn.qty}")
     else:
         clear_and_print("Yarn not found.")
 
 def delete_yarn():
-    clear_terminal()
+    clear_and_print("ALL YARN")
     yarns = Yarn.get_all()
     sorted_yarns = sorted(yarns, key=lambda yarn: yarn.brand)
     enumerated_yarns = {}
 
     for i, yarn in enumerate(sorted_yarns, start=1):
-        print(f"{i}. {yarn.brand}, {yarn.base}\nColor: {yarn.color} | Weight: {yarn.weight} | Yds: {yarn.yds} | Qty: {yarn.qty}\n")
+        print_with_return(f"{i}. {yarn.brand}, {yarn.base}\nColor: {yarn.color} | Weight: {yarn.weight} | Yds: {yarn.yds} | Qty: {yarn.qty}")
         enumerated_yarns[i] = yarn
 
     user_input = int(input("Enter the number of the yarn you want to delete: "))
 
     if user_input in enumerated_yarns:
         selected_yarn = Yarn.find_by_id(enumerated_yarns[user_input].id)
-        clear_and_print("Yarn deleted:", f"{selected_yarn.brand}, {selected_yarn.base}\nColor: {selected_yarn.color} | Weight: {selected_yarn.weight} | Yds: {selected_yarn.yds} | Qty: {selected_yarn.qty}")
+        clear_and_print("YARN DELETED", f"{selected_yarn.brand}, {selected_yarn.base}\nColor: {selected_yarn.color} | Weight: {selected_yarn.weight} | Yds: {selected_yarn.yds} | Qty: {selected_yarn.qty}")
         selected_yarn.delete()
     else:
         clear_and_print("Not a valid option.")
