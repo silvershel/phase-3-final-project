@@ -2,6 +2,21 @@
 from models.__init__ import CURSOR, CONN
 from models.yarn import Yarn
 
+# assigning an attribute or calling a method?
+# revisit differences between attributes and properties
+# why bother using a property? What additional functionality do they bring to the table?
+# ORM
+# method instance_from_db explain what's happening
+# how getter and setter work, protecting attributes
+# responsibility of class vs instance
+# testing, debugging tools (breakpoint (need to call it))
+
+class House:
+    def __init__(self, windows, doors, id = None):
+        self.id = id
+        self.windows = windows
+        self.doors = doors
+
 class Project:
     VALID_CATEGORIES = ["Garment", "Accessory", "Other"]
     all = {}
