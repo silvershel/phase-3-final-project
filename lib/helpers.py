@@ -4,13 +4,12 @@ import os
 from models.project import Project
 from models.yarn import Yarn
 
-# GENERAL
-# Error handling consistency. Check all validations as they relate to the menu.
-# Make sure headers are consistent
-# Think about where "------" goes in menu vs after code execution.
-# Be able to exit out of input fields
-# Be able to skip input fields
+# TO DO
 # Mark yarn as unavailable if in use by another project.
+# Refactor repetitive code.
+# Check all validations and error handling.
+# Add ability to skip input fields.
+# Add ability to exit out of input fields.
 
 # GENERAL FUNCTIONS
 def clear_terminal():
@@ -218,7 +217,8 @@ def list_all_yarn():
 
 def list_yarn_used(user_input):
     projects = Project.get_all()
-    selected_project = Project.find_by_id(projects[user_input - 1].id)
+    sorted_projects = sorted(projects, key=lambda project: project.pattern)
+    selected_project = Project.find_by_id(sorted_projects[user_input - 1].id)
 
     yarns = Yarn.get_all()
     used_yarns = [yarn for yarn in yarns if yarn.project_id == selected_project.id]
